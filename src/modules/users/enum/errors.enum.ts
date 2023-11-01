@@ -3,5 +3,6 @@ export enum ErrorEnum {
     USER_NOT_EXISTS = 'User does not exist',
     BAD_REQUEST = 'Bad Request',
     UNAUTHORIZED = 'Unauthorized',
-    USER_EXISTS = 'Username already exists'
+    USER_EXISTS = 'Username already exists',
+    PASSWORD_NOT_MATCH = 'Invalid email or password'
 }

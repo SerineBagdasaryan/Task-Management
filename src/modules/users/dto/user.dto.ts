@@ -8,4 +8,8 @@ export class UserDto {
     @IsNotEmpty({ message: 'Password is required' })
     @IsString({ message: 'Password must be a string' })
     password: string;
+
+    @IsNotEmpty({ message: 'Password is required' })
+    @IsString({ message: 'Password must be a string' })
+    name: string;
 }

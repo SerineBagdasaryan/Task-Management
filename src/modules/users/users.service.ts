@@ -1,4 +1,4 @@
-import {BadRequestException, ConflictException, Injectable} from '@nestjs/common';
+import {BadRequestException, ConflictException, Injectable, UnauthorizedException} from '@nestjs/common';
 import { UserDto } from './dto/user.dto';
 import {UserRepository} from "./entity/users.repository";
 import {User} from "./entity/users.entity";
@@ -15,20 +15,20 @@ export class UsersService {
     }
 
     async createUser(userDto: UserDto): Promise<User> {
-        const { email, password } = userDto;
+        const { email, password, name } = userDto;
 
         try {
             const existingUser = await this._userRepository.findByEmail(email);
             if (existingUser) {
                 throw new ConflictException(ErrorEnum.USER_EXISTS);
             }
-
-            const user = new User();
-            user.email = email;
             const hashedPassword = await bcrypt.hash(password, 10);
-            user.password = hashedPassword;
-            user.role = RoleEnum.USER;
-
+            const user = await this._userRepository.create({
+                email,
+                password: hashedPassword,
+                name,
+                role: RoleEnum.USER
+            });
             return this._userRepository.save(user);
         } catch (error) {
             throw error;
@@ -45,7 +45,7 @@ export class UsersService {
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
-            throw new BadRequestException(ErrorEnum.BAD_REQUEST);
+            throw new UnauthorizedException(ErrorEnum.PASSWORD_NOT_MATCH);
         }
         const payload = { sub: user.id, email: user.email };
 
