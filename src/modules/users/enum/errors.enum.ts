@@ -1,4 +1,4 @@
-export enum ErrorEnum {
+export enum Error {
     EMAIL_EXISTS = 'Email Already exists',
     USER_NOT_EXISTS = 'User does not exist',
     BAD_REQUEST = 'Bad Request',

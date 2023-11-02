@@ -1,4 +1,4 @@
-import {Module} from '@nestjs/common';
+import {MiddlewareConsumer, Module} from '@nestjs/common';
 import {ConfigModule} from '@nestjs/config';
 import {AppController} from './app.controller';
 import {AppService} from './app.service';
@@ -6,6 +6,7 @@ import {DatabaseModule} from "./database/database.config";
 import * as Joi from 'joi'
 import {UsersModule} from "./modules/users/users.module";
 import {AuthModule} from "./modules/auth/auth.module";
+import {AuthMiddleware} from "./common/middlewares/auth.middleware";
 
 @Module({
     imports: [
@@ -27,4 +28,7 @@ import {AuthModule} from "./modules/auth/auth.module";
     providers: [AppService],
 })
 export class AppModule {
+    configure(consumer: MiddlewareConsumer) {
+    consumer.apply(AuthMiddleware).forRoutes('users');
+}
 }

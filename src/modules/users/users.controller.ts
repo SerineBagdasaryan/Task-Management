@@ -1,17 +1,17 @@
-import {Controller, Get, Post, UseGuards, Request} from '@nestjs/common';
-import {UsersService} from "./users.service";
-import {AuthGuard} from '../../common/guards/auth.guard';
+import {Controller, Get} from '@nestjs/common';
+import {User} from "./entity/users.entity";
+import {User as UserDecorator} from "../../common/decorators/user.decorator"
 
 
 @Controller('users')
 export class UsersController {
-    constructor(private readonly _usersService: UsersService) {
+    constructor() {
     }
 
-    @UseGuards(AuthGuard)
+
     @Get('profile')
-    getProfile(@Request() req) {
-        return req.user;
+    async findOne(@UserDecorator() user: User): Promise<User> {
+        return user;
     }
 
 }
