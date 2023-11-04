@@ -7,6 +7,7 @@ import * as Joi from 'joi'
 import {UsersModule} from "./modules/users/users.module";
 import {AuthModule} from "./modules/auth/auth.module";
 import {AuthMiddleware} from "./common/middlewares/auth.middleware";
+import {TasksModule} from "./modules/tasks/tasks.module";
 
 @Module({
     imports: [
@@ -22,13 +23,14 @@ import {AuthMiddleware} from "./common/middlewares/auth.middleware";
         }),
         DatabaseModule,
         UsersModule,
-        AuthModule
+        AuthModule,
+        TasksModule
     ],
     controllers: [AppController],
     providers: [AppService],
 })
 export class AppModule {
     configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthMiddleware).forRoutes('users');
+    consumer.apply(AuthMiddleware).forRoutes('users', 'tasks');
 }
 }

@@ -1,6 +1,7 @@
-import {Entity, Column} from 'typeorm';
+import {Entity, Column, OneToMany} from 'typeorm';
 import {BaseEntity} from "../../../common/entities/base.entity";
 import {Role} from "../../../common/enums/role.enum";
+import {Task} from "../../tasks/entities/task.entity";
 
 @Entity()
 export class User extends BaseEntity {
@@ -23,4 +24,7 @@ export class User extends BaseEntity {
         default: Role.USER,
     })
     role: Role;
+
+    @OneToMany(() => Task, task => task.user)
+    tasks: Task[];
 }
