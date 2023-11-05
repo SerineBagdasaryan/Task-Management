@@ -18,6 +18,7 @@ export class TaskRepository extends Repository<Task> {
     async findAll(userId: number, query: BaseQueryDto): Promise<[Task[], number]>  {
         const result = this.taskRepository
             .createQueryBuilder('task')
+            .leftJoinAndSelect('task.user', 'user')
             .where('task.userId = :userId', { userId })
             .take(Number(query.take || 10))
             .skip(Number(query.skip || 0));
