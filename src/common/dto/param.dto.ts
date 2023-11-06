@@ -1,3 +1,6 @@
+import {IsNumber} from "class-validator";
+
 export class ParamDto {
-id: number;
+    @IsNumber()
+    id: number;
 }

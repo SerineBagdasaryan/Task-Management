@@ -1,5 +1,5 @@
 import {Column, Entity, JoinColumn, ManyToOne} from "typeorm";
-import {TaskStatus} from "../enum/TaskStatus.enum";
+import {TaskStatus} from "../enum/task-status.enum";
 import {User} from "../../users/entities/users.entity";
 import {BaseEntity} from "../../../common/entities/base.entity";
 @Entity()
