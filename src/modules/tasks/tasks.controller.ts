@@ -10,6 +10,7 @@ import {BaseQueryDto} from "../../common/dto/base-query.dto";
 import {ResponseDataPaginationDTO} from "../../common/dto/response-data-pagination.dto";
 import {ParamDto} from "../../common/dto/param.dto";
 import {ResponseDTO} from "../../common/dto/response.dto";
+import {FilterTaskDto} from "./dto/filter-task.dto";
 
 @Controller('tasks')
 export class TasksController {
@@ -39,5 +40,12 @@ export class TasksController {
   @Delete(':id')
   delete(@Param('id') id: ParamDto): Promise<ResponseDTO> {
     return this._tasksService.delete(id);
+  }
+  @Get('filtered')
+  async filteredTasks(
+      @UserDecorator() user: User,
+      @Query() query: FilterTaskDto,
+  ): Promise<ResponseDataPaginationDTO<Task[]>> {
+    return this._tasksService.filteredTasks(query, user.id);
   }
 }

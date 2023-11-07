@@ -13,13 +13,19 @@ export class Task extends BaseEntity{
     @Column({ type: 'enum', enum: TaskStatus, default: TaskStatus.TODO })
     status: TaskStatus;
 
-    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    @Column({
+        type: 'timestamp',
+        default: () => 'CURRENT_TIMESTAMP',
+    name: "due_date"
+    })
     dueDate: Date;
 
-    @Column()
+    @Column({
+        name: "user_id"
+    })
     userId: number;
 
     @ManyToOne(() => User, user => user.tasks)
-    @JoinColumn({name: 'userId'})
+    @JoinColumn({name: 'user_id'})
     user: User;
 }

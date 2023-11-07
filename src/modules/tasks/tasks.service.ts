@@ -9,11 +9,37 @@ import {BaseQueryDto} from "../../common/dto/base-query.dto";
 import {ResponseDataPaginationDTO} from "../../common/dto/response-data-pagination.dto";
 import {ResponseDTO} from "../../common/dto/response.dto";
 import {ParamDto} from "../../common/dto/param.dto";
+import {FilterTaskDto} from "./dto/filter-task.dto";
+
 
 @Injectable()
 export class TasksService {
 
     constructor(private readonly _taskRepository: TaskRepository) {
+    }
+
+
+    async filteredTasks(
+        query: FilterTaskDto,
+        userId: number,
+    ): Promise<ResponseDataPaginationDTO<Task[]>> {
+        try {
+            const [data, count] = await this._taskRepository.filteredTasks(
+                query,
+                userId
+            );
+            return Return.returnDataPagination(data, count);
+        } catch (e) {
+            throw new BadRequestException(e);
+        }
+    }
+
+    async getStat(userId: number): Promise<number> {
+        try {
+           return await this._taskRepository.getStat(userId);
+        } catch (e) {
+            throw new BadRequestException(e);
+        }
     }
 
     async createTask(createTaskDto: CreateTaskDto, userId: number): Promise<ResponseDataDTO<Task>> {
