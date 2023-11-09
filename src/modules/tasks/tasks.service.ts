@@ -8,8 +8,8 @@ import {ResponseDataDTO} from "../../common/dto/response-data.dto";
 import {BaseQueryDto} from "../../common/dto/base-query.dto";
 import {ResponseDataPaginationDTO} from "../../common/dto/response-data-pagination.dto";
 import {ResponseDTO} from "../../common/dto/response.dto";
-import {ParamDto} from "../../common/dto/param.dto";
 import {FilterTaskDto} from "./dto/filter-task.dto";
+import {User} from "../users/entities/users.entity";
 
 
 @Injectable()
@@ -21,12 +21,12 @@ export class TasksService {
 
     async filteredTasks(
         query: FilterTaskDto,
-        userId: number,
+        user: User,
     ): Promise<ResponseDataPaginationDTO<Task[]>> {
         try {
             const [data, count] = await this._taskRepository.filteredTasks(
                 query,
-                userId
+                user
             );
             return Return.returnDataPagination(data, count);
         } catch (e) {
@@ -57,10 +57,10 @@ export class TasksService {
         }
     }
 
-    async findAll(userId: number, query: BaseQueryDto): Promise<ResponseDataPaginationDTO<Task[]>> {
+    async findAll(user: User, query: BaseQueryDto): Promise<ResponseDataPaginationDTO<Task[]>> {
         try {
             const [data, count] =
-                await this._taskRepository.findAll(userId, query);
+                await this._taskRepository.findAll(user, query);
             return Return.returnDataPagination(data, count);
         } catch (e) {
             throw new BadRequestException(e);
@@ -72,7 +72,7 @@ export class TasksService {
         return `This action returns a #${id} task`;
     }
 
-    async update(id: ParamDto, updateTaskDto: UpdateTaskDto): Promise<ResponseDTO> {
+    async update(id: number, updateTaskDto: UpdateTaskDto): Promise<ResponseDTO> {
         try {
             await this._taskRepository.updateTask(id, updateTaskDto);
             return Return.ok();
@@ -81,7 +81,7 @@ export class TasksService {
         }
     }
 
-    async delete(id: ParamDto): Promise<ResponseDTO> {
+    async delete(id: number): Promise<ResponseDTO> {
         try {
             await this._taskRepository.delete(id);
             return Return.ok();

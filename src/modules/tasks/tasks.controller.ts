@@ -1,4 +1,4 @@
-import {Controller, Get, Post, Body, Patch, Param, Delete, Query} from '@nestjs/common';
+import {Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseIntPipe} from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
@@ -8,7 +8,6 @@ import {Task} from "./entities/task.entity";
 import {ResponseDataDTO} from "../../common/dto/response-data.dto";
 import {BaseQueryDto} from "../../common/dto/base-query.dto";
 import {ResponseDataPaginationDTO} from "../../common/dto/response-data-pagination.dto";
-import {ParamDto} from "../../common/dto/param.dto";
 import {ResponseDTO} from "../../common/dto/response.dto";
 import {FilterTaskDto} from "./dto/filter-task.dto";
 
@@ -28,17 +27,18 @@ export class TasksController {
       @UserDecorator() user: User,
       @Query() query: BaseQueryDto,
   ): Promise<ResponseDataPaginationDTO<Task[]>> {
-    return this._tasksService.findAll(user.id, query);
+    return this._tasksService.findAll(user, query);
   }
 
 
   @Patch(':id')
-  update(@Param('id') id: ParamDto, @Body() updateTaskDto: UpdateTaskDto): Promise<ResponseDTO> {
+  update(@Param('id', ParseIntPipe) id: number,
+         @Body() updateTaskDto: UpdateTaskDto): Promise<ResponseDTO> {
     return this._tasksService.update(id, updateTaskDto);
   }
 
   @Delete(':id')
-  delete(@Param('id') id: ParamDto): Promise<ResponseDTO> {
+  delete(@Param('id', ParseIntPipe) id: number,): Promise<ResponseDTO> {
     return this._tasksService.delete(id);
   }
   @Get('filtered')
@@ -46,6 +46,6 @@ export class TasksController {
       @UserDecorator() user: User,
       @Query() query: FilterTaskDto,
   ): Promise<ResponseDataPaginationDTO<Task[]>> {
-    return this._tasksService.filteredTasks(query, user.id);
+    return this._tasksService.filteredTasks(query, user);
   }
 }

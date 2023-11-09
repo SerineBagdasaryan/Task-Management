@@ -1,11 +1,12 @@
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import {InjectRepository} from '@nestjs/typeorm';
+import {Repository} from 'typeorm';
 import {Task} from "./task.entity";
 import {BaseQueryDto} from "../../../common/dto/base-query.dto";
 import {UpdateTaskDto} from "../dto/update-task.dto";
-import {ParamDto} from "../../../common/dto/param.dto";
+// import {ParamDto} from "../../../common/dto/param.dto";
 import {FilterTaskDto} from "../dto/filter-task.dto";
-
+import {User} from "../../users/entities/users.entity";
+import {Role} from "../../../common/enums/role.enum";
 
 
 export class TaskRepository extends Repository<Task> {
@@ -18,26 +19,31 @@ export class TaskRepository extends Repository<Task> {
 
     async filteredTasks(
         query: FilterTaskDto,
-        userId: number,
+        user: User,
     ): Promise<[Task[], number]> {
-        const result =
-            this.createQueryBuilder('task')
-            .leftJoinAndSelect('task.user', 'user')
-            .where('task.userId = :userId', { userId })
-            .take(Number(query.take || 10))
-            .skip(Number(query.skip || 0));
 
-        if(query?.status) {
-                result.andWhere('task."status" = :status', {
-                    status: query?.status,
-                });
+        const queryBuilder = this.taskRepository.createQueryBuilder('task');
+
+        if (user.role === Role.USER) {
+            queryBuilder.where('task.userId = :userId', {userId: user.id});
+        } else {
+            queryBuilder.leftJoinAndSelect('task.user', 'user');
         }
-        if(query?.dueDate) {
-                result.andWhere('task."due_date" >= :dueDate', {
-                    dueDate: query?.dueDate,
-                });
+        if (query?.status) {
+            queryBuilder.andWhere('task."status" = :status', {
+                status: query?.status,
+            });
         }
-        return await result.getManyAndCount();
+        if (query?.dueDate) {
+            queryBuilder.andWhere('task."due_date" >= :dueDate', {
+                dueDate: query?.dueDate,
+            });
+        }
+
+        return await queryBuilder
+            .take(Number(query.take || 10))
+            .skip(Number(query.skip || 0))
+            .getManyAndCount();
     }
 
 
@@ -46,23 +52,29 @@ export class TaskRepository extends Repository<Task> {
             .createQueryBuilder('task')
             .where('task.userId = :userId', { userId }).getCount();
     }
-    async findAll(userId: number, query: BaseQueryDto): Promise<[Task[], number]>  {
-        const result = this.taskRepository
-            .createQueryBuilder('task')
-            .leftJoinAndSelect('task.user', 'user')
-            .where('task.userId = :userId', { userId })
-            .take(Number(query.take || 10))
-            .skip(Number(query.skip || 0));
 
-        return await result.getManyAndCount();
+    async findAll(user: User, query: BaseQueryDto): Promise<[Task[], number]> {
+
+        const queryBuilder = this.taskRepository.createQueryBuilder('task');
+
+        if (user.role === Role.USER) {
+            queryBuilder.where('task.userId = :userId', {userId: user.id});
+        } else {
+            queryBuilder.leftJoinAndSelect('task.user', 'user');
+        }
+
+        return await queryBuilder
+            .take(Number(query.take || 10))
+            .skip(Number(query.skip || 0))
+            .getManyAndCount();
 
     }
 
-    async updateTask(id: ParamDto, updateUserDto: UpdateTaskDto): Promise<void> {
-         await this.taskRepository.createQueryBuilder('task')
+    async updateTask(id: number, updateUserDto: UpdateTaskDto): Promise<void> {
+        await this.taskRepository.createQueryBuilder('task')
             .update(Task)
             .set(updateUserDto)
-            .where('task.id = :id', { id })
+            .where('task.id = :id', {id})
             .execute();
     }
 
