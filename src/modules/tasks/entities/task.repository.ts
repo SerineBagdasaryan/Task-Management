@@ -3,7 +3,6 @@ import {Repository} from 'typeorm';
 import {Task} from "./task.entity";
 import {BaseQueryDto} from "../../../common/dto/base-query.dto";
 import {UpdateTaskDto} from "../dto/update-task.dto";
-// import {ParamDto} from "../../../common/dto/param.dto";
 import {FilterTaskDto} from "../dto/filter-task.dto";
 import {User} from "../../users/entities/users.entity";
 import {Role} from "../../../common/enums/role.enum";
