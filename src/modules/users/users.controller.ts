@@ -1,6 +1,6 @@
 import {Controller, Get} from '@nestjs/common';
 import {User} from "./entities/users.entity";
-import {User as UserDecorator} from "../../common/decorators/user.decorator"
+import {User as UserDecorator} from "@Decorator/user.decorator"
 import {UsersService} from "./users.service";
 
 

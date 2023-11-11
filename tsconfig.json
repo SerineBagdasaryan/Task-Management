@@ -18,6 +18,12 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "noUnusedLocals": true,
-    "noUnusedParameters": true
+    "noUnusedParameters": true,
+    "paths": {
+      "@/*": ["src/*"],
+      "@Helper/*": ["src/common/helpers/*"],
+      "@Decorator/*": ["src/common/decorators/*"],
+      "@Dto/*": ["src/common/dto/*"]
+    }
   }
 }

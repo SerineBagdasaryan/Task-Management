@@ -1,11 +1,11 @@
 import {InjectRepository} from '@nestjs/typeorm';
-import {Repository} from 'typeorm';
+import {DeleteResult, Repository} from 'typeorm';
 import {Task} from "./task.entity";
-import {BaseQueryDto} from "../../../common/dto/base-query.dto";
+import {BaseQueryDto} from "@Dto/base-query.dto";
 import {UpdateTaskDto} from "../dto/update-task.dto";
 import {FilterTaskDto} from "../dto/filter-task.dto";
 import {User} from "../../users/entities/users.entity";
-import {Role} from "../../../common/enums/role.enum";
+import {Role} from "@/common/enums/role.enum";
 
 
 export class TaskRepository extends Repository<Task> {
@@ -69,12 +69,27 @@ export class TaskRepository extends Repository<Task> {
 
     }
 
-    async updateTask(id: number, updateUserDto: UpdateTaskDto): Promise<void> {
-        await this.taskRepository.createQueryBuilder('task')
+    async updateTask(id: number, updateUserDto: UpdateTaskDto, user: User): Promise<void> {
+       const result = this.taskRepository.createQueryBuilder('task')
             .update(Task)
             .set(updateUserDto)
             .where('task.id = :id', {id})
-            .execute();
+
+        if (user.role === Role.USER) {
+            result.andWhere('task.user_id = :userId', {userId: user.id});
+        }
+        await result.execute();
+
+    }
+
+    async deleteTask(id: number, user: User): Promise<DeleteResult> {
+        const result =  await this.createQueryBuilder('task')
+            .delete()
+            .where('task.id = :id', { id })
+        if (user.role === Role.USER) {
+            result.andWhere('task.user_id = :userId', {userId: user.id});
+        }
+          return await result.execute();
     }
 
 
