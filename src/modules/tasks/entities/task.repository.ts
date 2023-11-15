@@ -6,6 +6,7 @@ import {UpdateTaskDto} from "../dto/update-task.dto";
 import {FilterTaskDto} from "../dto/filter-task.dto";
 import {User} from "../../users/entities/users.entity";
 import {Role} from "@/common/enums/role.enum";
+import {TaskFindAllOptions} from "@/modules/tasks/interfaces/find-task-options.interface";
 
 
 export class TaskRepository extends Repository<Task> {
@@ -44,29 +45,23 @@ export class TaskRepository extends Repository<Task> {
             .skip(Number(query.skip || 0))
             .getManyAndCount();
     }
-
-
-    async getStat(userId: number, ): Promise<number> {
-       return this.taskRepository
-            .createQueryBuilder('task')
-            .where('task.userId = :userId', { userId }).getCount();
+    async getStat(userId: number): Promise<number> {
+       return await this.taskRepository.count({ relations: ['user'], where: { user: { id: userId } } });
     }
 
     async findAll(user: User, query: BaseQueryDto): Promise<[Task[], number]> {
-
-        const queryBuilder = this.taskRepository.createQueryBuilder('task');
+        const options: TaskFindAllOptions = {
+            take: Number(query.take || 10),
+            skip: Number(query.skip || 0),
+        };
 
         if (user.role === Role.USER) {
-            queryBuilder.where('task.userId = :userId', {userId: user.id});
+            options.where = { user: { id: user.id } };
         } else {
-            queryBuilder.leftJoinAndSelect('task.user', 'user');
+            options.relations = ['user'];
         }
 
-        return await queryBuilder
-            .take(Number(query.take || 10))
-            .skip(Number(query.skip || 0))
-            .getManyAndCount();
-
+        return await this.taskRepository.findAndCount(options);
     }
 
     async updateTask(id: number, updateUserDto: UpdateTaskDto, user: User): Promise<void> {

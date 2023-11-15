@@ -14,11 +14,19 @@ import {RoleGuard} from "@/common/guards/roles.guard";
 import {Roles} from "@/common/decorators/roles.decorator";
 import {Role} from "@/common/enums/role.enum";
 import {DeleteResult} from "typeorm";
+import {ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
+import {DefaultValue} from "@/common/utils/default-value";
+import {TitleValue} from "./utils/title-value";
 
+@ApiTags(DefaultValue.title)
 @Controller('tasks')
 export class TasksController {
   constructor(private readonly _tasksService: TasksService) {}
 
+  @ApiOperation({ summary: TitleValue.createTask })
+  @ApiResponse({
+    type: Task,
+  })
   @Post()
   createTask(
       @UserDecorator() user: User,
@@ -39,7 +47,10 @@ export class TasksController {
     return 'Hello User!';
   }
 
-
+  @ApiOperation({ summary: TitleValue.getTask })
+  @ApiResponse({
+    type: [Task],
+  })
   @Get()
   findAll(
       @UserDecorator() user: User,
@@ -48,7 +59,10 @@ export class TasksController {
     return this._tasksService.findAll(user, query);
   }
 
-
+  @ApiOperation({ summary: TitleValue.updateTask })
+  @ApiResponse({
+    type: ResponseDTO,
+  })
   @Patch(':id')
   update(@UserDecorator() user: User,
          @Param('id', ParseIntPipe) id: number,
@@ -56,11 +70,20 @@ export class TasksController {
     return this._tasksService.update(id, updateTaskDto, user);
   }
 
+  @ApiOperation({ summary: TitleValue.deleteTask })
+  @ApiResponse({
+    type: DeleteResult,
+  })
   @Delete(':id')
   delete(@Param('id', ParseIntPipe) id: number,
          @UserDecorator() user: User): Promise<DeleteResult> {
     return this._tasksService.delete(id, user);
   }
+
+  @ApiOperation({ summary: TitleValue.filterTask })
+  @ApiResponse({
+    type: [Task],
+  })
   @Get('filtered')
   async filteredTasks(
       @UserDecorator() user: User,

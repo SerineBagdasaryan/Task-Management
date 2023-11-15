@@ -8,6 +8,8 @@ import {UsersModule} from "./modules/users/users.module";
 import {AuthModule} from "./modules/auth/auth.module";
 import {AuthMiddleware} from "./common/middlewares/auth.middleware";
 import {TasksModule} from "./modules/tasks/tasks.module";
+import {StudentsModule} from "@/modules/students/students.module";
+import {CoursesModule} from "@/modules/courses/courses.module";
 
 @Module({
     imports: [
@@ -24,7 +26,9 @@ import {TasksModule} from "./modules/tasks/tasks.module";
         DatabaseModule,
         UsersModule,
         AuthModule,
-        TasksModule
+        TasksModule,
+        StudentsModule,
+        CoursesModule
     ],
     controllers: [AppController],
     providers: [AppService],

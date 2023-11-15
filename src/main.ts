@@ -2,16 +2,31 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import {ConfigService} from "@nestjs/config";
 import {ValidationPipe, VersioningType} from "@nestjs/common";
+import {DocumentBuilder, SwaggerModule} from "@nestjs/swagger";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
+  const host = configService.get<string>('HOST');
+  const port = configService.get<number>('PORT');
+  const appName = configService.get<string>('APP_NAME');
+  const appDescription = configService.get<string>('APP_DESCRIPTION');
+  const options = new DocumentBuilder()
+      .setTitle(appName)
+      .setDescription(appDescription)
+      .setVersion('1.0')
+      .addServer(`http://${host}:${port}/api/v1`)
+      .addTag('Tasks')
+      .build();
+
+  const document = SwaggerModule.createDocument(app, options);
+  SwaggerModule.setup('api-docs', app, document);
+
   app.enableVersioning({
     type: VersioningType.URI,
   });
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe());
-  const configService = app.get(ConfigService);
-  const port = configService.get<number>('PORT');
   app.setGlobalPrefix('api/v1');
   await app.listen(port || 3000);
 }
