@@ -2,22 +2,20 @@ import {Controller, Get} from '@nestjs/common';
 import {User} from "./entities/users.entity";
 import {User as UserDecorator} from "@Decorator/user.decorator"
 import {UsersService} from "./users.service";
-import {ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
-import {DefaultValue} from "@/common/utils/default-value";
+import {ApiOkResponse, ApiOperation, ApiTags} from "@nestjs/swagger";
 import {TitleValue} from "./utils/title-value";
 
 
 
-@ApiTags(DefaultValue.title)
+@ApiTags(TitleValue.title)
 @Controller('users')
 export class UsersController {
     constructor(private readonly _usersService: UsersService) {
     }
 
     @ApiOperation({ summary: TitleValue.getProfile})
-    @ApiResponse({
-        type: User,
-        status: 200
+    @ApiOkResponse({
+        type: User
     })
     @Get('profile')
     async findOne(@UserDecorator() user: User): Promise<User> {
@@ -25,9 +23,8 @@ export class UsersController {
     }
 
     @ApiOperation({ summary: TitleValue.getStat })
-    @ApiResponse({
-        type: Number,
-        status: 200
+    @ApiOkResponse({
+        type: Number
     })
     @Get('stat')
     async getStat(@UserDecorator() user: User): Promise<number> {

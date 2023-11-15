@@ -14,17 +14,16 @@ import {RoleGuard} from "@/common/guards/roles.guard";
 import {Roles} from "@/common/decorators/roles.decorator";
 import {Role} from "@/common/enums/role.enum";
 import {DeleteResult} from "typeorm";
-import {ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
-import {DefaultValue} from "@/common/utils/default-value";
+import {ApiBody, ApiOkResponse, ApiOperation, ApiTags} from "@nestjs/swagger";
 import {TitleValue} from "./utils/title-value";
 
-@ApiTags(DefaultValue.title)
+@ApiTags(TitleValue.title)
 @Controller('tasks')
 export class TasksController {
   constructor(private readonly _tasksService: TasksService) {}
 
   @ApiOperation({ summary: TitleValue.createTask })
-  @ApiResponse({
+  @ApiOkResponse({
     type: Task,
   })
   @Post()
@@ -34,12 +33,21 @@ export class TasksController {
     return this._tasksService.createTask(createTaskDto, user.id);
   }
 
+  @ApiOperation({ summary: TitleValue.adminAccess })
+  @ApiOkResponse({
+    type: String,
+  })
   @Roles(Role.ADMIN)
   @UseGuards(RoleGuard)
   @Get('admin')
   greetingsAdmin(): string {
     return 'Hello Admin!';
   }
+
+  @ApiOperation({ summary: TitleValue.userAccess })
+  @ApiOkResponse({
+    type: String,
+  })
   @Roles(Role.USER)
   @UseGuards(RoleGuard)
   @Get('user')
@@ -48,7 +56,7 @@ export class TasksController {
   }
 
   @ApiOperation({ summary: TitleValue.getTask })
-  @ApiResponse({
+  @ApiOkResponse({
     type: [Task],
   })
   @Get()
@@ -60,9 +68,10 @@ export class TasksController {
   }
 
   @ApiOperation({ summary: TitleValue.updateTask })
-  @ApiResponse({
+  @ApiOkResponse({
     type: ResponseDTO,
   })
+  @ApiBody({ type: UpdateTaskDto})
   @Patch(':id')
   update(@UserDecorator() user: User,
          @Param('id', ParseIntPipe) id: number,
@@ -71,7 +80,7 @@ export class TasksController {
   }
 
   @ApiOperation({ summary: TitleValue.deleteTask })
-  @ApiResponse({
+  @ApiOkResponse({
     type: DeleteResult,
   })
   @Delete(':id')
@@ -81,7 +90,7 @@ export class TasksController {
   }
 
   @ApiOperation({ summary: TitleValue.filterTask })
-  @ApiResponse({
+  @ApiOkResponse({
     type: [Task],
   })
   @Get('filtered')
