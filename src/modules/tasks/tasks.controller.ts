@@ -14,7 +14,7 @@ import {RoleGuard} from "@/common/guards/roles.guard";
 import {Roles} from "@/common/decorators/roles.decorator";
 import {Role} from "@/common/enums/role.enum";
 import {DeleteResult} from "typeorm";
-import {ApiBody, ApiOkResponse, ApiOperation, ApiTags} from "@nestjs/swagger";
+import {ApiBody, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags} from "@nestjs/swagger";
 import {TitleValue} from "./utils/title-value";
 
 @ApiTags(TitleValue.title)
@@ -23,8 +23,9 @@ export class TasksController {
   constructor(private readonly _tasksService: TasksService) {}
 
   @ApiOperation({ summary: TitleValue.createTask })
-  @ApiOkResponse({
+  @ApiCreatedResponse({
     type: Task,
+    description: "Task Created successfully"
   })
   @Post()
   createTask(
