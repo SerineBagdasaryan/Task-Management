@@ -6,7 +6,6 @@ import {User as UserDecorator} from "@Decorator/user.decorator";
 import {User} from "../users/entities/users.entity";
 import {Task} from "./entities/task.entity";
 import {ResponseDataDTO} from "@/common/dto/response-data.dto";
-import {BaseQueryDto} from "@/common/dto/base-query.dto";
 import {ResponseDataPaginationDTO} from "@/common/dto/response-data-pagination.dto";
 import {ResponseDTO} from "@/common/dto/response.dto";
 import {FilterTaskDto} from "./dto/filter-task.dto";
@@ -63,7 +62,7 @@ export class TasksController {
   @Get()
   findAll(
       @UserDecorator() user: User,
-      @Query() query: BaseQueryDto,
+      @Query() query: FilterTaskDto,
   ): Promise<ResponseDataPaginationDTO<Task[]>> {
     return this._tasksService.findAll(user, query);
   }
@@ -88,17 +87,5 @@ export class TasksController {
   delete(@Param('id', ParseIntPipe) id: number,
          @UserDecorator() user: User): Promise<DeleteResult> {
     return this._tasksService.delete(id, user);
-  }
-
-  @ApiOperation({ summary: TitleValue.filterTask })
-  @ApiOkResponse({
-    type: [Task],
-  })
-  @Get('filtered')
-  async filteredTasks(
-      @UserDecorator() user: User,
-      @Query() query: FilterTaskDto,
-  ): Promise<ResponseDataPaginationDTO<Task[]>> {
-    return this._tasksService.filteredTasks(query, user);
   }
 }

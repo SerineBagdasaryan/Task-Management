@@ -5,7 +5,6 @@ import {TaskRepository} from "./entities/task.repository";
 import {Task} from "./entities/task.entity";
 import {Return} from "@Helper/return.helper";
 import {ResponseDataDTO} from "@Dto/response-data.dto";
-import {BaseQueryDto} from "@Dto/base-query.dto";
 import {ResponseDataPaginationDTO} from "@Dto/response-data-pagination.dto";
 import {ResponseDTO} from "@Dto/response.dto";
 import {FilterTaskDto} from "./dto/filter-task.dto";
@@ -17,22 +16,6 @@ import {DeleteResult} from "typeorm";
 export class TasksService {
 
     constructor(private readonly _taskRepository: TaskRepository) {
-    }
-
-
-    async filteredTasks(
-        query: FilterTaskDto,
-        user: User,
-    ): Promise<ResponseDataPaginationDTO<Task[]>> {
-        try {
-            const [data, count] = await this._taskRepository.filteredTasks(
-                query,
-                user
-            );
-            return Return.returnDataPagination(data, count);
-        } catch (e) {
-            throw new BadRequestException(e);
-        }
     }
 
     async getStat(userId: number): Promise<number> {
@@ -58,7 +41,7 @@ export class TasksService {
         }
     }
 
-    async findAll(user: User, query: BaseQueryDto): Promise<ResponseDataPaginationDTO<Task[]>> {
+    async findAll(user: User, query: FilterTaskDto): Promise<ResponseDataPaginationDTO<Task[]>> {
         try {
             const [data, count] =
                 await this._taskRepository.findAll(user, query);
@@ -67,10 +50,6 @@ export class TasksService {
             throw new BadRequestException(e);
         }
 
-    }
-
-    findOne(id: number) {
-        return `This action returns a #${id} task`;
     }
 
     async update(id: number, updateTaskDto: UpdateTaskDto, user: User): Promise<ResponseDTO> {

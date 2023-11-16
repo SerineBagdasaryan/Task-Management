@@ -1,7 +1,6 @@
 import {InjectRepository} from '@nestjs/typeorm';
-import {DeleteResult, Repository} from 'typeorm';
+import {DeleteResult, MoreThanOrEqual, Repository} from 'typeorm';
 import {Task} from "./task.entity";
-import {BaseQueryDto} from "@Dto/base-query.dto";
 import {UpdateTaskDto} from "../dto/update-task.dto";
 import {FilterTaskDto} from "../dto/filter-task.dto";
 import {User} from "../../users/entities/users.entity";
@@ -16,40 +15,11 @@ export class TaskRepository extends Repository<Task> {
     ) {
         super(taskRepository.target, taskRepository.manager, taskRepository.queryRunner);
     }
-
-    async filteredTasks(
-        query: FilterTaskDto,
-        user: User,
-    ): Promise<[Task[], number]> {
-
-        const queryBuilder = this.taskRepository.createQueryBuilder('task');
-
-        if (user.role === Role.USER) {
-            queryBuilder.where('task.userId = :userId', {userId: user.id});
-        } else {
-            queryBuilder.leftJoinAndSelect('task.user', 'user');
-        }
-        if (query?.status) {
-            queryBuilder.andWhere('task."status" = :status', {
-                status: query?.status,
-            });
-        }
-        if (query?.dueDate) {
-            queryBuilder.andWhere('task."due_date" >= :dueDate', {
-                dueDate: query?.dueDate,
-            });
-        }
-
-        return await queryBuilder
-            .take(Number(query.take || 10))
-            .skip(Number(query.skip || 0))
-            .getManyAndCount();
-    }
     async getStat(userId: number): Promise<number> {
        return await this.taskRepository.count({ relations: ['user'], where: { user: { id: userId } } });
     }
 
-    async findAll(user: User, query: BaseQueryDto): Promise<[Task[], number]> {
+    async findAll(user: User, query: FilterTaskDto): Promise<[Task[], number]> {
         const options: TaskFindAllOptions = {
             take: Number(query.take || 10),
             skip: Number(query.skip || 0),
@@ -61,8 +31,24 @@ export class TaskRepository extends Repository<Task> {
             options.relations = ['user'];
         }
 
-        return await this.taskRepository.findAndCount(options);
+        if (query?.status) {
+            options.where = {
+                ...options.where,
+                status: query.status,
+            };
+        }
+
+        if (query?.dueDate) {
+            options.where = {
+                ...options.where,
+                dueDate: MoreThanOrEqual(query.dueDate),
+            };
+        }
+
+    return await this.taskRepository.findAndCount(options);
     }
+
+
 
     async updateTask(id: number, updateUserDto: UpdateTaskDto, user: User): Promise<void> {
        const result = this.taskRepository.createQueryBuilder('task')
