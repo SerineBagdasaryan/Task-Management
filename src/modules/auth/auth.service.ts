@@ -30,13 +30,15 @@ export class AuthService {
         }
         const hashPassword = await bcrypt.hash(password, 10);
 
-       return await this._userService.createUser({
+        const user = await this._userService.createUser({
             ...createUserDto,
             password: hashPassword,
         })
+        delete user.password;
+        return user;
     }
 
-    private async generateToken(user: User): Promise<TokenResponseDto> {
+    async generateToken(user: User): Promise<TokenResponseDto> {
         const payload = {email: user.email, id: user.id, role: user.role};
         return {
             accessToken: await this._jwtService.signAsync(payload),
@@ -44,7 +46,7 @@ export class AuthService {
         };
     }
 
-    private async validateUser(userDto: Pick<CreateUserDto, 'email' | 'password'>): Promise<User> {
+    async validateUser(userDto: Pick<CreateUserDto, 'email' | 'password'>): Promise<User> {
         const user = await this._userService.getUserByEmail(userDto.email);
         if (!user) {
             throw new BadRequestException(Error.USER_NOT_EXISTS);

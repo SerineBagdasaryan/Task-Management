@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import {ConfigService} from "@nestjs/config";
 import {ValidationPipe, VersioningType} from "@nestjs/common";
 import {DocumentBuilder, SwaggerModule} from "@nestjs/swagger";
+import {LoggingResponseInterceptor} from "@/common/interceptors/logging-response.interceptor";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -11,6 +12,7 @@ async function bootstrap() {
   const port = configService.get<number>('PORT');
   const appName = configService.get<string>('APP_NAME');
   const appDescription = configService.get<string>('APP_DESCRIPTION');
+  app.useGlobalInterceptors(new LoggingResponseInterceptor());
   const options = new DocumentBuilder()
       .setTitle(appName)
       .setDescription(appDescription)

@@ -8,7 +8,7 @@ import {TaskRepository} from "./entities/task.repository";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Task]),
+    TypeOrmModule.forFeature([Task, TaskRepository]),
     ConfigModule
   ],
   controllers: [TasksController],
