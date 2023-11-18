@@ -1,6 +1,7 @@
 import {IsDateString, IsNotEmpty, IsString} from "class-validator";
 import {ApiProperty} from "@nestjs/swagger";
 import {DefaultValue} from "@/common/utils/default-value";
+import {IsDateFormat} from "@Decorator/date.validator";
 
 export class CreateTaskDto {
     @ApiProperty({
@@ -26,8 +27,8 @@ export class CreateTaskDto {
         default: new Date(),
         required: true,
     })
-    @IsNotEmpty({ message: 'Due Date is required' })
     @IsDateString()
-    dueDate: Date;
+    @IsDateFormat('yyyy-MM-dd', { message: 'Date must be in the format yyyy-MM-dd.' })
+    dueDate: string;
 
 }
