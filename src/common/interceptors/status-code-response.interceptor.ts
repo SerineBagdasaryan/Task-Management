@@ -7,6 +7,7 @@ export class StatusCodeResponseInterceptor implements NestInterceptor {
         return next.handle().pipe(
             map(data => ({
                 data: data?.data ?? data,
+                count: data?.count ?? 0 ? data.count : undefined,
                 statusCode: context.switchToHttp().getResponse().statusCode
             }))
         );
