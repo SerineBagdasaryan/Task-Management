@@ -11,6 +11,8 @@ import {JwtService} from "@nestjs/jwt";
 import {Error} from "../users/enum/errors.enum";
 import * as bcrypt from 'bcrypt';
 import {TokenResponseDto} from "../users/dto/token-response.dto";
+import {Return} from "@Helper/return.helper";
+import {ResponseDataDTO} from "@Dto/response-data.dto";
 
 @Injectable()
 export class AuthService {
@@ -22,7 +24,7 @@ export class AuthService {
         return this.generateToken(user);
     }
 
-    async registration(createUserDto: CreateUserDto): Promise<User> {
+    async registration(createUserDto: CreateUserDto): Promise<ResponseDataDTO<User>> {
         const { email, password } = createUserDto;
         const existingUser = await this._userService.getUserByEmail(email);
         if (existingUser) {
@@ -30,10 +32,11 @@ export class AuthService {
         }
         const hashPassword = await bcrypt.hash(password, 10);
 
-       return await this._userService.createUser({
+       const data =  await this._userService.createUser({
             ...createUserDto,
             password: hashPassword,
         })
+        return Return.returnData(data);
     }
 
     async generateToken(user: User): Promise<TokenResponseDto> {

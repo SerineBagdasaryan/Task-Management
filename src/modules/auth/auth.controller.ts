@@ -6,6 +6,7 @@ import {User} from "../users/entities/users.entity";
 import {ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags} from "@nestjs/swagger";
 import {TitleValue} from "@/modules/auth/utils/title-value";
 import {LoginUserDto} from "@/modules/users/dto/login-user.dto";
+import {ResponseDataDTO} from "@Dto/response-data.dto";
 @ApiTags(TitleValue.title)
 @Controller('auth')
 export class AuthController {
@@ -27,7 +28,7 @@ export class AuthController {
     description: "User Created successfully"
   })
   @Post('/register')
-  registration(@Body() userDto: CreateUserDto): Promise<User> {
+  registration(@Body() userDto: CreateUserDto): Promise<ResponseDataDTO<User>> {
     return this._authService.registration(userDto)
   }
 }
