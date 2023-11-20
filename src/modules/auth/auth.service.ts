@@ -30,12 +30,10 @@ export class AuthService {
         }
         const hashPassword = await bcrypt.hash(password, 10);
 
-        const user = await this._userService.createUser({
+       return await this._userService.createUser({
             ...createUserDto,
             password: hashPassword,
         })
-        delete user.password;
-        return user;
     }
 
     async generateToken(user: User): Promise<TokenResponseDto> {

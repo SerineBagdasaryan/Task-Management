@@ -4,6 +4,7 @@ import {Role} from "../../../common/enums/role.enum";
 import {Task} from "../../tasks/entities/task.entity";
 import {DefaultValue} from "@/common/utils/default-value";
 import {ApiProperty} from "@nestjs/swagger";
+import {Exclude} from "class-transformer";
 
 @Entity()
 export class User extends BaseEntity {
@@ -19,6 +20,7 @@ export class User extends BaseEntity {
         default: DefaultValue.password,
     })
     @Column()
+    @Exclude()
     password: string;
 
     @ApiProperty({

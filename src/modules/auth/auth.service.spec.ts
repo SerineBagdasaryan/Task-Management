@@ -4,6 +4,8 @@ import {Test, TestingModule} from "@nestjs/testing";
 import {JwtService} from "@nestjs/jwt";
 import {User} from "@/modules/users/entities/users.entity";
 import {accessToken, mockUserData} from "@/common/mocks/mock-data";
+import {classToPlain} from "class-transformer";
+type UserWithoutId = Pick<User, Exclude<keyof User, 'id'>>;
 
 describe('AuthService', () => {
   let authService: AuthService;
@@ -16,7 +18,6 @@ describe('AuthService', () => {
         {
           provide: UsersService,
           useValue: {
-            validateCredentials: jest.fn(),
             createUser: jest.fn(),
             getUserByEmail: jest.fn(),
           },
@@ -35,20 +36,14 @@ describe('AuthService', () => {
   });
 
   it('should sign up a user and return the user', async () => {
-    delete user.id;
+    const newUser: UserWithoutId = user;
     jest.spyOn(usersServiceMock, 'getUserByEmail').mockResolvedValue(undefined);
-    jest.spyOn(usersServiceMock, 'createUser').mockResolvedValue(user);
+    jest.spyOn(usersServiceMock, 'createUser').mockResolvedValue(newUser as User);
 
     const response = await authService.registration(user);
+    const expectedResult = classToPlain(user) as User;
 
-    expect(response).toEqual({
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      role: user.role,
-    });
-
-    expect(response.password).toBeUndefined();
+    expect(response).toEqual(expectedResult);
   });
 
   it('should login and return a TokenResponseDto on successful login', async () => {

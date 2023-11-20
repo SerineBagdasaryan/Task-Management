@@ -1,4 +1,4 @@
-import {Body, Controller, Post} from '@nestjs/common';
+import {Body, Controller, HttpCode, HttpStatus, Post} from '@nestjs/common';
 import {AuthService } from './auth.service';
 import {CreateUserDto} from "../users/dto/user.dto";
 import {TokenResponseDto} from "../users/dto/token-response.dto";
@@ -11,7 +11,7 @@ import {LoginUserDto} from "@/modules/users/dto/login-user.dto";
 export class AuthController {
   constructor(private readonly _authService: AuthService) {
   }
-
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: TitleValue.login })
   @ApiOkResponse({
     type: TokenResponseDto,

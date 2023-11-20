@@ -1,7 +1,7 @@
-import { NestFactory } from '@nestjs/core';
+import {NestFactory, Reflector} from '@nestjs/core';
 import { AppModule } from './app.module';
 import {ConfigService} from "@nestjs/config";
-import {ValidationPipe, VersioningType} from "@nestjs/common";
+import {ClassSerializerInterceptor, ValidationPipe, VersioningType} from "@nestjs/common";
 import {DocumentBuilder, SwaggerModule} from "@nestjs/swagger";
 import {StatusCodeResponseInterceptor} from "@/common/interceptors/status-code-response.interceptor";
 
@@ -13,6 +13,11 @@ async function bootstrap() {
   const appName = configService.get<string>('APP_NAME');
   const appDescription = configService.get<string>('APP_DESCRIPTION');
   app.useGlobalInterceptors(new StatusCodeResponseInterceptor());
+
+  const reflector = app.get(Reflector);
+
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector));
+
   const options = new DocumentBuilder()
       .setTitle(appName)
       .setDescription(appDescription)
