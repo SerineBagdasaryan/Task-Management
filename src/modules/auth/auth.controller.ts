@@ -6,6 +6,7 @@ import {User} from "../users/entities/users.entity";
 import {ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags} from "@nestjs/swagger";
 import {TitleValue} from "@/modules/auth/utils/title-value";
 import {LoginUserDto} from "@/modules/users/dto/login-user.dto";
+import {User as UserDecorator} from "@Decorator/user.decorator";
 
 @ApiTags(TitleValue.title)
 @Controller('auth')
@@ -30,5 +31,10 @@ export class AuthController {
   @Post('/register')
   registration(@Body() userDto: CreateUserDto): Promise<User> {
     return this._authService.registration(userDto)
+  }
+
+  @Post('change-password')
+  async changePassword(@UserDecorator() user: User, @Body('newPassword') newPassword: string): Promise<TokenResponseDto> {
+    return this._authService.changePassword(user, newPassword)
   }
 }

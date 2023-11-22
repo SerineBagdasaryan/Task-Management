@@ -4,8 +4,10 @@ import {ConfigService} from "@nestjs/config";
 import {ClassSerializerInterceptor, ValidationPipe, VersioningType} from "@nestjs/common";
 import {DocumentBuilder, SwaggerModule} from "@nestjs/swagger";
 import {StatusCodeResponseInterceptor} from "@/common/interceptors/status-code-response.interceptor";
+import {initializeTransactionalContext} from "typeorm-transactional";
 
 async function bootstrap() {
+  initializeTransactionalContext();
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
   const host = configService.get<string>('HOST');

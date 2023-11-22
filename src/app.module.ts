@@ -1,4 +1,4 @@
-import {MiddlewareConsumer, Module} from '@nestjs/common';
+import {MiddlewareConsumer, Module, RequestMethod} from '@nestjs/common';
 import {ConfigModule} from '@nestjs/config';
 import {AppController} from './app.controller';
 import {AppService} from './app.service';
@@ -35,6 +35,6 @@ import {CoursesModule} from "@/modules/courses/courses.module";
 })
 export class AppModule {
     configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthMiddleware).forRoutes('users', 'tasks');
+    consumer.apply(AuthMiddleware).forRoutes('users', 'tasks', { path: 'auth/change-password', method: RequestMethod.POST });
 }
 }

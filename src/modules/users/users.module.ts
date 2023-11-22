@@ -6,16 +6,18 @@ import {ConfigModule} from "@nestjs/config";
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {User} from "./entities/users.entity";
 import {TasksModule} from "../tasks/tasks.module";
+import {UsersToken} from "@/modules/users/entities/users-token.entity";
+import {UsersTokenRepository} from "@/modules/users/entities/users-token.repository";
 
 
 
 @Module({
-    imports: [TypeOrmModule.forFeature([User]),
+    imports: [TypeOrmModule.forFeature([User, UsersToken]),
         ConfigModule, TasksModule
     ],
-    providers: [UsersService, UserRepository],
+    providers: [UsersService, UserRepository, UsersTokenRepository],
     controllers: [UsersController],
-    exports: [UsersService, UserRepository]
+    exports: [UsersService, UserRepository, UsersTokenRepository]
 })
 export class UsersModule {
 }
