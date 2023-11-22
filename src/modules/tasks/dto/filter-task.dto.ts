@@ -1,4 +1,4 @@
-import {BaseQueryDto} from "../../../common/dto/base-query.dto";
+import {BaseQueryDto} from "@Dto/base-query.dto";
 import {IsDateString, IsEnum, IsOptional} from "class-validator";
 import {TaskStatus} from "../enum/task-status.enum";
 import {ApiProperty} from "@nestjs/swagger";

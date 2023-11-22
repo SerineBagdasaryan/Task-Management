@@ -1,4 +1,4 @@
-import {Body, Controller, HttpCode, HttpStatus, Post} from '@nestjs/common';
+import {Body, Controller, HttpCode, HttpStatus, Patch, Post} from '@nestjs/common';
 import {AuthService } from './auth.service';
 import {CreateUserDto} from "../users/dto/user.dto";
 import {TokenResponseDto} from "../users/dto/token-response.dto";
@@ -33,7 +33,7 @@ export class AuthController {
     return this._authService.registration(userDto)
   }
 
-  @Post('change-password')
+  @Patch('/password')
   async changePassword(@UserDecorator() user: User, @Body('newPassword') newPassword: string): Promise<TokenResponseDto> {
     return this._authService.changePassword(user, newPassword)
   }

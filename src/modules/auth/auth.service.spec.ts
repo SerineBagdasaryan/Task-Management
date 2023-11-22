@@ -20,6 +20,7 @@ describe('AuthService', () => {
           useValue: {
             createUser: jest.fn(),
             getUserByEmail: jest.fn(),
+            createOrUpdateToken: jest.fn(),
           },
         },
         {
@@ -51,10 +52,9 @@ describe('AuthService', () => {
 
     jest.spyOn(usersServiceMock, 'getUserByEmail').mockResolvedValue(user);
     jest.spyOn(authService, 'validateUser').mockResolvedValue(user);
-    jest.spyOn(authService, 'generateToken').mockResolvedValue({
-      accessToken: accessToken,
-      id: user.id,
-    });
+    jest.spyOn(authService, 'generateToken').mockResolvedValue(
+      accessToken
+    );
 
     const result = await authService.login(userDto);
 

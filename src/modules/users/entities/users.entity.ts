@@ -1,6 +1,6 @@
 import {Entity, Column, OneToMany} from 'typeorm';
-import {BaseEntity} from "../../../common/entities/base.entity";
-import {Role} from "../../../common/enums/role.enum";
+import {BaseEntity} from "@/common/entities/base.entity";
+import {Role} from "@/common/enums/role.enum";
 import {Task} from "../../tasks/entities/task.entity";
 import {DefaultValue} from "@/common/utils/default-value";
 import {ApiProperty} from "@nestjs/swagger";
