@@ -35,6 +35,6 @@ import {CoursesModule} from "@/modules/courses/courses.module";
 })
 export class AppModule {
     configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthMiddleware).forRoutes('users', 'tasks', { path: 'auth/change-password', method: RequestMethod.POST });
+    consumer.apply(AuthMiddleware).forRoutes('users', 'tasks', { path: 'auth/password', method: RequestMethod.PATCH });
 }
 }
