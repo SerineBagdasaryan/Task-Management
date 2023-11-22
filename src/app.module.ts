@@ -1,5 +1,5 @@
 import {MiddlewareConsumer, Module, RequestMethod} from '@nestjs/common';
-import {ConfigModule} from '@nestjs/config';
+import {ConfigModule, ConfigService} from '@nestjs/config';
 import {AppController} from './app.controller';
 import {AppService} from './app.service';
 import {DatabaseModule} from "./database/database.config";
@@ -10,6 +10,8 @@ import {AuthMiddleware} from "./common/middlewares/auth.middleware";
 import {TasksModule} from "./modules/tasks/tasks.module";
 import {StudentsModule} from "@/modules/students/students.module";
 import {CoursesModule} from "@/modules/courses/courses.module";
+import {CacheModule} from '@nestjs/cache-manager';
+import { redisStore } from 'cache-manager-redis-yet';
 
 @Module({
     imports: [
@@ -28,7 +30,21 @@ import {CoursesModule} from "@/modules/courses/courses.module";
         AuthModule,
         TasksModule,
         StudentsModule,
-        CoursesModule
+        CoursesModule,
+        CacheModule.registerAsync({
+            imports: [ConfigModule],
+            isGlobal: true,
+            useFactory: async (configService: ConfigService) => ({
+                ttl: configService.get<number>('TTL'),
+                store: await redisStore({
+                    socket: {
+                        host: configService.get<string>('REDIS_HOST'),
+                        port: configService.get<number>('REDIS_PORT'),
+                    },
+                }),
+            }),
+            inject: [ConfigService]
+        }),
     ],
     controllers: [AppController],
     providers: [AppService],

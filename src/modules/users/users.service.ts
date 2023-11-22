@@ -3,30 +3,14 @@ import {CreateUserDto} from './dto/user.dto';
 import {UserRepository} from "./entities/users.repository";
 import {User} from "./entities/users.entity";
 import {TasksService} from "../tasks/tasks.service";
-import {UsersToken} from "@/modules/users/entities/users-token.entity";
-import {UsersTokenRepository} from "@/modules/users/entities/users-token.repository";
 import {UpdateResult} from "typeorm";
 
 @Injectable()
 export class UsersService {
     constructor(private readonly _userRepository: UserRepository,
-                private readonly _taskService: TasksService,
-                private readonly _usersTokenRepository: UsersTokenRepository) {
+                private readonly _taskService: TasksService
+    ) {
     }
-
-    async createOrUpdateToken(userId: number, newToken: string): Promise<UsersToken> {
-        let userToken = await this._usersTokenRepository.findOneById(userId);
-
-        if (!userToken) {
-            userToken = this._usersTokenRepository.create();
-            userToken.userId = userId;
-        }
-
-        userToken.token = newToken;
-
-        return this._usersTokenRepository.save(userToken);
-    }
-
 
 
     async getUserByEmail(email: string): Promise<User> {

@@ -1,7 +1,9 @@
 import {
     BadRequestException,
     ConflictException,
-    Injectable, InternalServerErrorException,
+    Inject,
+    Injectable,
+    InternalServerErrorException,
     UnauthorizedException
 } from '@nestjs/common';
 import {User} from "../users/entities/users.entity";
@@ -12,11 +14,14 @@ import {Error} from "../users/enum/errors.enum";
 import * as bcrypt from 'bcrypt';
 import {TokenResponseDto} from "../users/dto/token-response.dto";
 import {Transactional} from "typeorm-transactional";
+import {Cache} from 'cache-manager';
+import {CACHE_MANAGER} from '@nestjs/cache-manager'
 
 @Injectable()
 export class AuthService {
     constructor(private readonly _userService: UsersService,
                 private readonly _jwtService: JwtService,
+                @Inject(CACHE_MANAGER) private readonly _cacheManager: Cache
     ) {}
 
     @Transactional()
@@ -25,8 +30,7 @@ export class AuthService {
             const hashedPassword = await bcrypt.hash(newPassword, 10);
             await this._userService.updatePassword(user.id, hashedPassword);
 
-            const loginResponse = await this.login({ email: user.email, password: newPassword });
-            return loginResponse;
+            return await this.login({email: user.email, password: newPassword});
         } catch (error) {
             console.error('Error while changing password:', error);
             throw new InternalServerErrorException('Unable to change password');
@@ -37,7 +41,8 @@ export class AuthService {
     async login(userDto: Pick<CreateUserDto, 'email' | 'password'>): Promise<TokenResponseDto> {
         const user = await this.validateUser(userDto);
         const token = await this.generateToken(user);
-        await this._userService.createOrUpdateToken(user.id, token);
+        await this._cacheManager.del(String(user.id));
+        await this._cacheManager.set(String(user.id), token);
         return {
             accessToken: token,
             id: user.id

@@ -1,15 +1,15 @@
-import { Injectable, NestMiddleware, UnauthorizedException } from '@nestjs/common';
+import {Inject, Injectable, NestMiddleware, UnauthorizedException} from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import * as jwt from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
-import { Connection } from 'typeorm';
-import { UsersToken } from '@/modules/users/entities/users-token.entity';
+import {CACHE_MANAGER} from "@nestjs/cache-manager";
+import {Cache} from "cache-manager";
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
     constructor(
         private readonly _configService: ConfigService,
-        private readonly _connection: Connection
+        @Inject(CACHE_MANAGER) private readonly _cacheManager: Cache
     ) {}
 
     async use(req: Request, _res: Response, next: NextFunction) {
@@ -22,9 +22,9 @@ export class AuthMiddleware implements NestMiddleware {
         try {
             const secret = this._configService.get('SECRET');
             const decodedToken = jwt.verify(token, secret);
-            const storedToken = await this._connection.getRepository(UsersToken).findOneById(decodedToken['id']);
+            const storedToken = await this._cacheManager.get(String(decodedToken['id']));
 
-            if (!storedToken || storedToken.token !== token) {
+            if (!storedToken || storedToken !== token) {
                 this._throwUnauthorized('Invalid token');
             }
             req['user'] = decodedToken;
