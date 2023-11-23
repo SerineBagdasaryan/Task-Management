@@ -35,7 +35,6 @@ import { redisStore } from 'cache-manager-redis-yet';
             imports: [ConfigModule],
             isGlobal: true,
             useFactory: async (configService: ConfigService) => ({
-                ttl: configService.get<number>('TTL'),
                 store: await redisStore({
                     socket: {
                         host: configService.get<string>('REDIS_HOST'),

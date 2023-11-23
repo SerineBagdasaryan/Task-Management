@@ -16,12 +16,14 @@ import {TokenResponseDto} from "../users/dto/token-response.dto";
 import {Transactional} from "typeorm-transactional";
 import {Cache} from 'cache-manager';
 import {CACHE_MANAGER} from '@nestjs/cache-manager'
+import {ConfigService} from "@nestjs/config";
 
 @Injectable()
 export class AuthService {
     constructor(private readonly _userService: UsersService,
                 private readonly _jwtService: JwtService,
-                @Inject(CACHE_MANAGER) private readonly _cacheManager: Cache
+                @Inject(CACHE_MANAGER) private readonly _cacheManager: Cache,
+                private readonly _configService: ConfigService
     ) {}
 
     @Transactional()
@@ -42,7 +44,8 @@ export class AuthService {
         const user = await this.validateUser(userDto);
         const token = await this.generateToken(user);
         await this._cacheManager.del(String(user.id));
-        await this._cacheManager.set(String(user.id), token);
+        const ttl = this._configService.get<number>('TTL');
+        await this._cacheManager.set(String(user.id), token, ttl);
         return {
             accessToken: token,
             id: user.id
