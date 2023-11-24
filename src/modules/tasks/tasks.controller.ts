@@ -8,7 +8,7 @@ import {
   Delete,
   Query,
   ParseIntPipe,
-  UseGuards,
+  UseGuards, HttpCode, HttpStatus,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
@@ -89,14 +89,14 @@ export class TasksController {
          @Body() updateTaskDto: UpdateTaskDto): Promise<ResponseDTO> {
     return this._tasksService.update(id, updateTaskDto, user);
   }
-
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: TitleValue.deleteTask })
   @ApiOkResponse({
     type: DeleteResult,
   })
   @Delete(':id')
   delete(@Param('id', ParseIntPipe) id: number,
-         @UserDecorator() user: User): Promise<DeleteResult> {
+         @UserDecorator() user: User): Promise<void> {
     return this._tasksService.delete(id, user);
   }
 }

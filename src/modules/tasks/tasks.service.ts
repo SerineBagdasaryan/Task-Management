@@ -1,4 +1,4 @@
-import {BadRequestException, Injectable} from '@nestjs/common';
+import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
 import {CreateTaskDto} from './dto/create-task.dto';
 import {UpdateTaskDto} from './dto/update-task.dto';
 import {TaskRepository} from "./entities/task.repository";
@@ -9,7 +9,6 @@ import {ResponseDataPaginationDTO} from "@Dto/response-data-pagination.dto";
 import {ResponseDTO} from "@Dto/response.dto";
 import {FilterTaskDto} from "./dto/filter-task.dto";
 import {User} from "../users/entities/users.entity";
-import {DeleteResult} from "typeorm";
 
 
 @Injectable()
@@ -61,11 +60,14 @@ export class TasksService {
         }
     }
 
-    async delete(id: number, user: User): Promise<DeleteResult> {
+    async delete(id: number, user: User): Promise<void> {
         try {
-         return await this._taskRepository.deleteTask(id, user);
+            const result = await this._taskRepository.deleteTask(id, user);
+            if (result.affected === 0) {
+                throw new NotFoundException(`Task not found`);
+            }
         } catch (e) {
-            throw new BadRequestException(e);
+            throw new BadRequestException(e.message);
         }
     }
 }

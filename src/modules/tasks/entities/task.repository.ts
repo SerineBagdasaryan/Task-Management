@@ -70,7 +70,7 @@ export class TaskRepository extends Repository<Task> {
         if (user.role === Role.USER) {
             result.andWhere('task.user_id = :userId', {userId: user.id});
         }
-          return await result.execute();
+        return await result.execute();
     }
 
 
