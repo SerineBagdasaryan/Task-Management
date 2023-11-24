@@ -23,8 +23,7 @@ import {FilterTaskDto} from "./dto/filter-task.dto";
 import {RoleGuard} from "@/common/guards/roles.guard";
 import {Roles} from "@/common/decorators/roles.decorator";
 import {Role} from "@/common/enums/role.enum";
-import {DeleteResult} from "typeorm";
-import {ApiBody, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags} from "@nestjs/swagger";
+import {ApiBody, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {TitleValue} from "./utils/title-value";
 
 @ApiTags(TitleValue.title)
@@ -91,9 +90,7 @@ export class TasksController {
   }
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: TitleValue.deleteTask })
-  @ApiOkResponse({
-    type: DeleteResult,
-  })
+  @ApiResponse({ status: HttpStatus.NO_CONTENT})
   @Delete(':id')
   delete(@Param('id', ParseIntPipe) id: number,
          @UserDecorator() user: User): Promise<void> {
