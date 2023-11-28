@@ -8,23 +8,32 @@ import {
   Delete,
   Query,
   ParseIntPipe,
-  UseGuards, HttpCode, HttpStatus,
+  UseGuards,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import {User as UserDecorator} from "@Decorator/user.decorator";
-import {User} from "../users/entities/users.entity";
-import {Task} from "./entities/task.entity";
-import {ResponseDataDTO} from "@/common/dto/response-data.dto";
-import {ResponseDataPaginationDTO} from "@/common/dto/response-data-pagination.dto";
-import {ResponseDTO} from "@/common/dto/response.dto";
-import {FilterTaskDto} from "./dto/filter-task.dto";
-import {RoleGuard} from "@/common/guards/roles.guard";
-import {Roles} from "@/common/decorators/roles.decorator";
-import {Role} from "@/common/enums/role.enum";
-import {ApiBody, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
-import {TitleValue} from "./utils/title-value";
+import { User as UserDecorator } from '@Decorator/user.decorator';
+import { User } from '../users/entities/users.entity';
+import { Task } from './entities/task.entity';
+import { ResponseDataDTO } from '@/common/dto/response-data.dto';
+import { ResponseDataPaginationDTO } from '@/common/dto/response-data-pagination.dto';
+import { ResponseDTO } from '@/common/dto/response.dto';
+import { FilterTaskDto } from './dto/filter-task.dto';
+import { RoleGuard } from '@/common/guards/roles.guard';
+import { Roles } from '@/common/decorators/roles.decorator';
+import { Role } from '@/common/enums/role.enum';
+import {
+  ApiBody,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { TitleValue } from './utils/title-value';
 
 @ApiTags(TitleValue.title)
 @Controller('tasks')
@@ -34,12 +43,13 @@ export class TasksController {
   @ApiOperation({ summary: TitleValue.createTask })
   @ApiCreatedResponse({
     type: Task,
-    description: "Task Created successfully"
+    description: 'Task Created successfully',
   })
   @Post()
   createTask(
-      @UserDecorator() user: User,
-      @Body() createTaskDto: CreateTaskDto): Promise<ResponseDataDTO<Task>> {
+    @UserDecorator() user: User,
+    @Body() createTaskDto: CreateTaskDto,
+  ): Promise<ResponseDataDTO<Task>> {
     return this._tasksService.createTask(createTaskDto, user.id);
   }
 
@@ -71,8 +81,8 @@ export class TasksController {
   })
   @Get()
   findAll(
-      @UserDecorator() user: User,
-      @Query() query: FilterTaskDto,
+    @UserDecorator() user: User,
+    @Query() query: FilterTaskDto,
   ): Promise<ResponseDataPaginationDTO<Task[]>> {
     return this._tasksService.findAll(user, query);
   }
@@ -81,19 +91,24 @@ export class TasksController {
   @ApiOkResponse({
     type: ResponseDTO,
   })
-  @ApiBody({ type: UpdateTaskDto})
+  @ApiBody({ type: UpdateTaskDto })
   @Patch(':id')
-  update(@UserDecorator() user: User,
-         @Param('id', ParseIntPipe) id: number,
-         @Body() updateTaskDto: UpdateTaskDto): Promise<ResponseDTO> {
+  update(
+    @UserDecorator() user: User,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateTaskDto: UpdateTaskDto,
+  ): Promise<ResponseDTO> {
     return this._tasksService.update(id, updateTaskDto, user);
   }
+
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: TitleValue.deleteTask })
-  @ApiResponse({ status: HttpStatus.NO_CONTENT})
+  @ApiResponse({ status: HttpStatus.NO_CONTENT })
   @Delete(':id')
-  delete(@Param('id', ParseIntPipe) id: number,
-         @UserDecorator() user: User): Promise<void> {
+  delete(
+    @Param('id', ParseIntPipe) id: number,
+    @UserDecorator() user: User,
+  ): Promise<void> {
     return this._tasksService.delete(id, user);
   }
 }
