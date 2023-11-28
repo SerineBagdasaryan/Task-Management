@@ -94,7 +94,7 @@
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
     "moduleNameMapper": {
-      "^@/(.*)$": "<rootDir>/../src/$1",
+      "^@(.*)$": "<rootDir>/../src/$1",
       "^@Helper/(.*)$": "<rootDir>/../src/common/helpers/$1",
       "^@Decorator/(.*)$": "<rootDir>/../src/common/decorators/$1",
       "^@Dto/(.*)$": "<rootDir>/../src/common/dto/$1"

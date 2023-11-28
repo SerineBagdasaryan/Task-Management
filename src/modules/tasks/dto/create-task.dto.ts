@@ -1,6 +1,6 @@
 import { IsDateString, IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { DefaultValue } from '@/common/utils/default-value';
+import { DefaultValue } from '@common/utils/default-value';
 import { IsDateFormat } from '@Decorator/date.validator';
 
 export class CreateTaskDto {

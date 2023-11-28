@@ -20,7 +20,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "paths": {
-      "@/*": ["src/*"],
+      "@*": ["src/*"],
       "@Helper/*": ["src/common/helpers/*"],
       "@Decorator/*": ["src/common/decorators/*"],
       "@Dto/*": ["src/common/dto/*"]

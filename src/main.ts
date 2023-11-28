@@ -7,7 +7,7 @@ import {
   VersioningType,
 } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { StatusCodeResponseInterceptor } from '@/common/interceptors/status-code-response.interceptor';
+import { StatusCodeResponseInterceptor } from '@common/interceptors/status-code-response.interceptor';
 import { initializeTransactionalContext } from 'typeorm-transactional';
 
 async function bootstrap() {

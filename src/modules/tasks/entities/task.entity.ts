@@ -1,9 +1,9 @@
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { TaskStatus } from '../enum/task-status.enum';
 import { User } from '../../users/entities/users.entity';
-import { BaseEntity } from '@/common/entities/base.entity';
+import { BaseEntity } from '@common/entities/base.entity';
 import { ApiProperty } from '@nestjs/swagger';
-import { DefaultValue } from '@/common/utils/default-value';
+import { DefaultValue } from '@common/utils/default-value';
 
 @Entity()
 export class Task extends BaseEntity {

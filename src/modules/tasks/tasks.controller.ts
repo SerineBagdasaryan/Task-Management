@@ -18,13 +18,13 @@ import { UpdateTaskDto } from './dto/update-task.dto';
 import { User as UserDecorator } from '@Decorator/user.decorator';
 import { User } from '../users/entities/users.entity';
 import { Task } from './entities/task.entity';
-import { ResponseDataDTO } from '@/common/dto/response-data.dto';
-import { ResponseDataPaginationDTO } from '@/common/dto/response-data-pagination.dto';
-import { ResponseDTO } from '@/common/dto/response.dto';
+import { ResponseDataDTO } from '@common/dto/response-data.dto';
+import { ResponseDataPaginationDTO } from '@common/dto/response-data-pagination.dto';
+import { ResponseDTO } from '@common/dto/response.dto';
 import { FilterTaskDto } from './dto/filter-task.dto';
-import { RoleGuard } from '@/common/guards/roles.guard';
-import { Roles } from '@/common/decorators/roles.decorator';
-import { Role } from '@/common/enums/role.enum';
+import { RoleGuard } from '@common/guards/roles.guard';
+import { Roles } from '@common/decorators/roles.decorator';
+import { Role } from '@common/enums/role.enum';
 import {
   ApiBody,
   ApiCreatedResponse,

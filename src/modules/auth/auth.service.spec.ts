@@ -3,7 +3,8 @@ import {UsersService} from "@/modules/users/users.service";
 import {Test, TestingModule} from "@nestjs/testing";
 import {JwtService} from "@nestjs/jwt";
 import {User} from "@/modules/users/entities/users.entity";
-import {accessToken, mockUserData} from "@/common/mocks/mock-data";
+import {accessToken, mockUserData} from "@common
+/mocks/mock-data";
 import {classToPlain} from "class-transformer";
 type UserWithoutId = Pick<User, Exclude<keyof User, 'id'>>;
 

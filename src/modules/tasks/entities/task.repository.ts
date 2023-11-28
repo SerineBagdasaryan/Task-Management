@@ -4,7 +4,7 @@ import { Task } from './task.entity';
 import { UpdateTaskDto } from '../dto/update-task.dto';
 import { FilterTaskDto } from '../dto/filter-task.dto';
 import { User } from '../../users/entities/users.entity';
-import { Role } from '@/common/enums/role.enum';
+import { Role } from '@common/enums/role.enum';
 import { TaskFindAllOptions } from '@/modules/tasks/interfaces/find-task-options.interface';
 
 export class TaskRepository extends Repository<Task> {
