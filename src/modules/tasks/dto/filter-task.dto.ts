@@ -11,7 +11,7 @@ export class FilterTaskDto extends BaseQueryDto {
   })
   @IsOptional()
   @IsDateString()
-  dueDate?: Date;
+  dueDate?: string;
 
   @ApiProperty({
     enum: TaskStatus,

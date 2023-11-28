@@ -10,13 +10,13 @@ import { User } from '../users/entities/users.entity';
 import { CreateUserDto } from '../users/dto/user.dto';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { Error } from '../users/enum/errors.enum';
 import * as bcrypt from 'bcrypt';
 import { TokenResponseDto } from '../users/dto/token-response.dto';
 import { Transactional } from 'typeorm-transactional';
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { ConfigService } from '@nestjs/config';
+import { ERROR_MESSAGES } from '@common/messages';
 
 @Injectable()
 export class AuthService {
@@ -61,7 +61,7 @@ export class AuthService {
     const { email, password } = createUserDto;
     const existingUser = await this._userService.getUserByEmail(email);
     if (existingUser) {
-      throw new ConflictException(Error.USER_EXISTS);
+        throw new ConflictException(ERROR_MESSAGES.USER_NAME_EXISTS);
     }
     const hashPassword = await bcrypt.hash(password, 10);
 
@@ -81,7 +81,7 @@ export class AuthService {
   ): Promise<User> {
     const user = await this._userService.getUserByEmail(userDto.email);
     if (!user) {
-      throw new BadRequestException(Error.USER_NOT_EXISTS);
+      throw new BadRequestException(ERROR_MESSAGES.USER_NOT_EXISTS);
     }
     const passwordEquals = await bcrypt.compare(
       userDto.password,
@@ -90,6 +90,6 @@ export class AuthService {
     if (user && passwordEquals) {
       return user;
     }
-    throw new UnauthorizedException(Error.PASSWORD_NOT_MATCH);
+    throw new UnauthorizedException(ERROR_MESSAGES.PASSWORD_NOT_MATCH);
   }
 }

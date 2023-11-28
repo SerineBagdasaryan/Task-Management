@@ -1,14 +1,19 @@
 import { NestFactory, Reflector } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { AppModule } from '@app.module';
 import { ConfigService } from '@nestjs/config';
 import {
   ClassSerializerInterceptor,
+  HttpException,
+  HttpStatus,
   ValidationPipe,
   VersioningType,
 } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { StatusCodeResponseInterceptor } from '@common/interceptors/status-code-response.interceptor';
+import { ResponseInterceptor } from '@common/interceptors';
 import { initializeTransactionalContext } from 'typeorm-transactional';
+import { IValidationErrors } from '@common/models';
+import { validationHandler } from '@common/helpers';
+import { HttpExceptionFilter } from '@common/http-filters';
 
 async function bootstrap() {
   initializeTransactionalContext();
@@ -18,7 +23,7 @@ async function bootstrap() {
   const port = configService.get<number>('PORT');
   const appName = configService.get<string>('APP_NAME');
   const appDescription = configService.get<string>('APP_DESCRIPTION');
-  app.useGlobalInterceptors(new StatusCodeResponseInterceptor());
+  app.useGlobalInterceptors(new ResponseInterceptor());
 
   const reflector = app.get(Reflector);
 
@@ -39,7 +44,35 @@ async function bootstrap() {
     type: VersioningType.URI,
   });
   app.enableCors();
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      forbidNonWhitelisted: false,
+      whitelist: true,
+      transform: true,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
+      stopAtFirstError: true,
+      exceptionFactory: (errors) => {
+        const errorResponse: IValidationErrors[] = [];
+        errors.forEach((e) => {
+          if (e.constraints) {
+            errorResponse.push(...validationHandler([e]));
+          }
+          if (e.children) {
+            errorResponse.push(
+              ...validationHandler(e.children, e.property?.toLowerCase()),
+            );
+          }
+        });
+        throw new HttpException(
+          { errors: errorResponse, message: 'ValidationError' },
+          HttpStatus.UNPROCESSABLE_ENTITY,
+        );
+      },
+    }),
+  );
+  app.useGlobalFilters(new HttpExceptionFilter());
   app.setGlobalPrefix('api/v1');
   await app.listen(port || 3000);
 }

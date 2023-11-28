@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumberString, IsOptional } from 'class-validator';
+import { IsNumber, IsOptional } from 'class-validator';
 
 export class BaseQueryDto {
   @ApiProperty({
@@ -7,16 +7,15 @@ export class BaseQueryDto {
     default: 10,
     required: false,
   })
-  @IsNumberString()
+  @IsNumber()
   @IsOptional()
-  take?: number;
+  take: number;
 
   @ApiProperty({
     type: Number,
     default: 0,
     required: false,
   })
-  @IsNumberString()
-  @IsOptional()
-  skip?: number;
+  @IsNumber()
+  skip: number;
 }

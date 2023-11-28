@@ -10,9 +10,10 @@ import { Task } from './entities/task.entity';
 import { Return } from '@Helper/return.helper';
 import { ResponseDataDTO } from '@Dto/response-data.dto';
 import { ResponseDataPaginationDTO } from '@Dto/response-data-pagination.dto';
-import { ResponseDTO } from '@Dto/response.dto';
 import { FilterTaskDto } from './dto/filter-task.dto';
 import { User } from '../users/entities/users.entity';
+import {ERROR_MESSAGES} from "@common/messages";
+import {UpdateResult} from "typeorm";
 
 @Injectable()
 export class TasksService {
@@ -22,7 +23,7 @@ export class TasksService {
     try {
       return await this._taskRepository.getStat(userId);
     } catch (e) {
-      throw new BadRequestException(e);
+      throw new BadRequestException(e.message);
     }
   }
 
@@ -59,12 +60,15 @@ export class TasksService {
     id: number,
     updateTaskDto: UpdateTaskDto,
     user: User,
-  ): Promise<ResponseDTO> {
+  ): Promise<UpdateResult> {
     try {
-      await this._taskRepository.updateTask(id, updateTaskDto, user);
-      return Return.ok();
+      const result = await this._taskRepository.updateTask(id, updateTaskDto, user);
+      if (result.affected === 0) {
+        throw new NotFoundException(ERROR_MESSAGES.TASK_NOT_EXISTS);
+      }
+      return result;
     } catch (e) {
-      throw new BadRequestException(e);
+      throw new BadRequestException(e.message);
     }
   }
 
@@ -72,7 +76,7 @@ export class TasksService {
     try {
       const result = await this._taskRepository.deleteTask(id, user);
       if (result.affected === 0) {
-        throw new NotFoundException(`Task not found`);
+        throw new NotFoundException(ERROR_MESSAGES.TASK_NOT_EXISTS);
       }
     } catch (e) {
       throw new BadRequestException(e.message);

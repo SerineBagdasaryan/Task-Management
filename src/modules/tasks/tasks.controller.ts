@@ -34,6 +34,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { TitleValue } from './utils/title-value';
+import {UpdateResult} from "typeorm";
 
 @ApiTags(TitleValue.title)
 @Controller('tasks')
@@ -97,7 +98,7 @@ export class TasksController {
     @UserDecorator() user: User,
     @Param('id', ParseIntPipe) id: number,
     @Body() updateTaskDto: UpdateTaskDto,
-  ): Promise<ResponseDTO> {
+  ): Promise<UpdateResult> {
     return this._tasksService.update(id, updateTaskDto, user);
   }
 
