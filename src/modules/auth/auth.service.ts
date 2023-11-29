@@ -17,6 +17,7 @@ import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { ConfigService } from '@nestjs/config';
 import { ERROR_MESSAGES } from '@common/messages';
+import {ChangePasswordDto} from "@modules/users/dto/change-password.dto";
 
 @Injectable()
 export class AuthService {
@@ -30,9 +31,15 @@ export class AuthService {
   @Transactional()
   async changePassword(
     user: User,
-    newPassword: string,
+    changePasswordDto: ChangePasswordDto,
   ): Promise<TokenResponseDto> {
+    const { newPassword } = changePasswordDto;
     try {
+      const existingUser = await this._userService.getUserByEmail(user.email);
+
+      if (!existingUser) {
+        throw new BadRequestException(ERROR_MESSAGES.USER_NOT_EXISTS);
+      }
       const hashedPassword = await bcrypt.hash(newPassword, 10);
       await this._userService.updatePassword(user.id, hashedPassword);
 

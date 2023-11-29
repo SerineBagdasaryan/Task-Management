@@ -1,17 +1,13 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { CreateTaskDto } from './dto/create-task.dto';
-import { UpdateTaskDto } from './dto/update-task.dto';
-import { TaskRepository } from './entities/task.repository';
-import { Task } from './entities/task.entity';
-import { Return } from '@Helper/return.helper';
-import { ResponseDataDTO } from '@Dto/response-data.dto';
-import { ResponseDataPaginationDTO } from '@Dto/response-data-pagination.dto';
-import { FilterTaskDto } from './dto/filter-task.dto';
-import { User } from '../users/entities/users.entity';
+import {BadRequestException, Injectable, NotFoundException,} from '@nestjs/common';
+import {CreateTaskDto} from './dto/create-task.dto';
+import {UpdateTaskDto} from './dto/update-task.dto';
+import {TaskRepository} from './entities/task.repository';
+import {Task} from './entities/task.entity';
+import {Return} from '@Helper/return.helper';
+import {ResponseDataDTO} from '@Dto/response-data.dto';
+import {ResponseDataPaginationDTO} from '@Dto/response-data-pagination.dto';
+import {FilterTaskDto} from './dto/filter-task.dto';
+import {User} from '../users/entities/users.entity';
 import {ERROR_MESSAGES} from "@common/messages";
 import {UpdateResult} from "typeorm";
 

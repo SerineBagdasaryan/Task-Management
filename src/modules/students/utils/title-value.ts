@@ -1,5 +1,5 @@
 export const TitleValue = {
-  title: 'Student',
+  title: 'Students',
   getStudent: 'Get Students',
   createStudent: 'Create Student',
 } as const;
