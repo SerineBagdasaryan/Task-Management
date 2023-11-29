@@ -1,5 +1,5 @@
 export const TitleValue = {
-  title: 'Task',
+  title: 'Tasks',
   createTask: 'Create Task',
   getTask: 'Get Tasks',
   updateTask: 'Update Task',

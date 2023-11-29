@@ -11,6 +11,7 @@ import { CreateUserDto } from '../users/dto/user.dto';
 import { TokenResponseDto } from '../users/dto/token-response.dto';
 import { User } from '../users/entities/users.entity';
 import {
+  ApiBody,
   ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
@@ -19,6 +20,7 @@ import {
 import { TitleValue } from '@/modules/auth/utils/title-value';
 import { LoginUserDto } from '@/modules/users/dto/login-user.dto';
 import { User as UserDecorator } from '@Decorator/user.decorator';
+import {ChangePasswordDto} from "@modules/users/dto/change-password.dto";
 
 @ApiTags(TitleValue.title)
 @Controller('auth')
@@ -44,12 +46,16 @@ export class AuthController {
   registration(@Body() userDto: CreateUserDto): Promise<User> {
     return this._authService.registration(userDto);
   }
-
+  @ApiOperation({ summary: TitleValue.updatePassword })
+  @ApiOkResponse({
+    type: TokenResponseDto,
+  })
+  @ApiBody({ type: ChangePasswordDto})
   @Patch('/password')
   async changePassword(
     @UserDecorator() user: User,
-    @Body('newPassword') newPassword: string,
+    @Body() changePasswordDto: ChangePasswordDto,
   ): Promise<TokenResponseDto> {
-    return this._authService.changePassword(user, newPassword);
+    return this._authService.changePassword(user, changePasswordDto);
   }
 }

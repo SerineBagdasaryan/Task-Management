@@ -1,9 +1,15 @@
-import { Controller, Get } from '@nestjs/common';
+import {Body, Controller, Get, Patch} from '@nestjs/common';
 import { User } from './entities/users.entity';
 import { User as UserDecorator } from '@Decorator/user.decorator';
 import { UsersService } from './users.service';
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiExcludeEndpoint,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { TitleValue } from './utils/title-value';
+import {UpdateProfileDto} from "@modules/users/dto/update-profile.dto";
 
 @ApiTags(TitleValue.title)
 @Controller('users')
@@ -16,13 +22,25 @@ export class UsersController {
   })
   @Get('profile')
   async findOne(@UserDecorator() user: User): Promise<User> {
-    return user;
+    return this._usersService.findOne(user.id);
+  }
+
+  @ApiOperation({ summary: TitleValue.updateProfile })
+  @ApiOkResponse({
+    type: User,
+  })
+  @Patch('profile')
+  async update(
+      @UserDecorator() user: User,
+      @Body() updateProfileDto: UpdateProfileDto): Promise<User> {
+    return this._usersService.update(user.id, updateProfileDto);
   }
 
   @ApiOperation({ summary: TitleValue.getStat })
   @ApiOkResponse({
     type: Number,
   })
+  @ApiExcludeEndpoint()
   @Get('stat')
   async getStat(@UserDecorator() user: User): Promise<number> {
     return this._usersService.getStat(user.id);

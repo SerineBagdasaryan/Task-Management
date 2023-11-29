@@ -28,13 +28,14 @@ import { Role } from '@common/enums/role.enum';
 import {
   ApiBody,
   ApiCreatedResponse,
+  ApiExcludeEndpoint,
   ApiOkResponse,
   ApiOperation,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { TitleValue } from './utils/title-value';
-import {UpdateResult} from "typeorm";
+import { UpdateResult } from 'typeorm';
 
 @ApiTags(TitleValue.title)
 @Controller('tasks')
@@ -58,6 +59,7 @@ export class TasksController {
   @ApiOkResponse({
     type: String,
   })
+  @ApiExcludeEndpoint()
   @Roles(Role.ADMIN)
   @UseGuards(RoleGuard)
   @Get('admin')
@@ -69,6 +71,7 @@ export class TasksController {
   @ApiOkResponse({
     type: String,
   })
+  @ApiExcludeEndpoint()
   @Roles(Role.USER)
   @UseGuards(RoleGuard)
   @Get('user')

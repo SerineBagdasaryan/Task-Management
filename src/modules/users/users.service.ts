@@ -4,6 +4,8 @@ import { UserRepository } from './entities/users.repository';
 import { User } from './entities/users.entity';
 import { TasksService } from '../tasks/tasks.service';
 import { UpdateResult } from 'typeorm';
+import {UpdateProfileDto} from "@modules/users/dto/update-profile.dto";
+import {ERROR_MESSAGES} from "@common/messages";
 
 @Injectable()
 export class UsersService {
@@ -14,6 +16,22 @@ export class UsersService {
 
   async getUserByEmail(email: string): Promise<User> {
     return await this._userRepository.findByEmail(email);
+  }
+
+  async findOne(id: number): Promise<User | undefined> {
+    return this._userRepository.findOneById(id);
+  }
+
+  async update(id: number, updateProfileDto: UpdateProfileDto): Promise<User> {
+    const user = await this.findOne(id);
+
+    if (!user) {
+      throw new BadRequestException(ERROR_MESSAGES.USER_NOT_EXISTS);
+    }
+
+    Object.assign(user, updateProfileDto);
+
+    return this._userRepository.save(user);
   }
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
