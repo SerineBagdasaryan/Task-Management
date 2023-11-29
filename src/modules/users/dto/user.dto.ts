@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsEmail, Length } from 'class-validator';
+import {IsString, IsNotEmpty, IsEmail, Length, MaxLength, MinLength} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { DefaultValue } from '@common/utils/default-value';
 
@@ -30,6 +30,8 @@ export class CreateUserDto {
     default: DefaultValue.firstName,
     required: true,
   })
+  @MinLength(3, { message: 'First name is too short' })
+  @MaxLength(30, { message: 'First name is too long' })
   @IsNotEmpty({ message: 'FirstName  is required' })
   @IsString({ message: 'FirstName must be a string' })
   firstName: string;
@@ -39,6 +41,8 @@ export class CreateUserDto {
     default: DefaultValue.lastName,
     required: true,
   })
+  @MinLength(3, { message: 'Last name is too short' })
+  @MaxLength(50, { message: 'Last name is too long' })
   @IsNotEmpty({ message: 'LastName is required' })
   @IsString({ message: 'LastName must be a string' })
   lastName: string;

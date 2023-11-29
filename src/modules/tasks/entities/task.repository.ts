@@ -1,5 +1,5 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import {DeleteResult, MoreThanOrEqual, Repository, UpdateResult} from 'typeorm';
+import { DeleteResult, MoreThanOrEqual, Repository } from 'typeorm';
 import { Task } from './task.entity';
 import { UpdateTaskDto } from '../dto/update-task.dto';
 import { FilterTaskDto } from '../dto/filter-task.dto';
@@ -57,19 +57,22 @@ export class TaskRepository extends Repository<Task> {
 
   async updateTask(
     id: number,
-    updateUserDto: UpdateTaskDto,
+    updateTaskDto: UpdateTaskDto,
     user: User,
-  ): Promise<UpdateResult> {
-    const result = this.taskRepository
-      .createQueryBuilder('task')
-      .update(Task)
-      .set(updateUserDto)
-      .where('task.id = :id', { id });
+  ): Promise<Task> {
+    const result = await this.taskRepository
+        .createQueryBuilder('task')
+        .update(Task)
+        .set(updateTaskDto)
+        .where('task.id = :id', { id })
+        .returning('*')
 
     if (user.role === Role.USER) {
       result.andWhere('task.user_id = :userId', { userId: user.id });
     }
-    return await result.execute();
+
+    const updatedUser = await result.execute();
+    return updatedUser.raw[0];
   }
 
   async deleteTask(id: number, user: User): Promise<DeleteResult> {

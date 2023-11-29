@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
 import { CreateUserDto } from './dto/user.dto';
 import { UserRepository } from './entities/users.repository';
 import { User } from './entities/users.entity';
@@ -23,6 +23,9 @@ export class UsersService {
   }
 
   async update(id: number, updateProfileDto: UpdateProfileDto): Promise<User> {
+    if(Object.keys(updateProfileDto).length === 0) {
+      throw new NotFoundException(ERROR_MESSAGES.EMPTY_BODY);
+    }
     const user = await this.findOne(id);
 
     if (!user) {

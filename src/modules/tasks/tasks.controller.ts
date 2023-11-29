@@ -20,7 +20,6 @@ import { User } from '../users/entities/users.entity';
 import { Task } from './entities/task.entity';
 import { ResponseDataDTO } from '@common/dto/response-data.dto';
 import { ResponseDataPaginationDTO } from '@common/dto/response-data-pagination.dto';
-import { ResponseDTO } from '@common/dto/response.dto';
 import { FilterTaskDto } from './dto/filter-task.dto';
 import { RoleGuard } from '@common/guards/roles.guard';
 import { Roles } from '@common/decorators/roles.decorator';
@@ -35,7 +34,6 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { TitleValue } from './utils/title-value';
-import { UpdateResult } from 'typeorm';
 
 @ApiTags(TitleValue.title)
 @Controller('tasks')
@@ -93,7 +91,7 @@ export class TasksController {
 
   @ApiOperation({ summary: TitleValue.updateTask })
   @ApiOkResponse({
-    type: ResponseDTO,
+    type: Task
   })
   @ApiBody({ type: UpdateTaskDto })
   @Patch(':id')
@@ -101,7 +99,7 @@ export class TasksController {
     @UserDecorator() user: User,
     @Param('id', ParseIntPipe) id: number,
     @Body() updateTaskDto: UpdateTaskDto,
-  ): Promise<UpdateResult> {
+  ): Promise<Task>{
     return this._tasksService.update(id, updateTaskDto, user);
   }
 

@@ -9,7 +9,6 @@ import {ResponseDataPaginationDTO} from '@Dto/response-data-pagination.dto';
 import {FilterTaskDto} from './dto/filter-task.dto';
 import {User} from '../users/entities/users.entity';
 import {ERROR_MESSAGES} from "@common/messages";
-import {UpdateResult} from "typeorm";
 
 @Injectable()
 export class TasksService {
@@ -56,10 +55,14 @@ export class TasksService {
     id: number,
     updateTaskDto: UpdateTaskDto,
     user: User,
-  ): Promise<UpdateResult> {
+  ): Promise<Task> {
     try {
-      const result = await this._taskRepository.updateTask(id, updateTaskDto, user);
-      if (result.affected === 0) {
+      if(Object.keys(updateTaskDto).length === 0) {
+        throw new NotFoundException(ERROR_MESSAGES.NOT_UPDATED_DATA);
+      }
+        const result = await this._taskRepository.updateTask(id, updateTaskDto, user);
+
+      if (!result) {
         throw new NotFoundException(ERROR_MESSAGES.TASK_NOT_EXISTS);
       }
       return result;
