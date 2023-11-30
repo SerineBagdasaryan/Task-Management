@@ -11,4 +11,7 @@ export const USER_MESSAGES = {
   USER_NOT_EXISTS: {
     message: 'err_user_not_exists',
   },
+  EMPTY_BODY: {
+    message: 'err_empty_updated_body',
+  },
 };

@@ -31,7 +31,7 @@ export class CreateTaskDto {
 
   @ApiProperty({
     type: Date,
-    default: new Date(),
+    default: '2023-11-29',
     required: true,
   })
   @IsDateString()
