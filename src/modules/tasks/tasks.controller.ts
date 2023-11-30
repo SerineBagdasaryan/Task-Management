@@ -26,7 +26,6 @@ import { Roles } from '@common/decorators/roles.decorator';
 import { Role } from '@common/enums/role.enum';
 import {
   ApiBody,
-  ApiCreatedResponse,
   ApiExcludeEndpoint,
   ApiOkResponse,
   ApiOperation,
@@ -34,6 +33,9 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { TitleValue } from './utils/title-value';
+import { ItemResponseTypeDecorator } from "@Decorator/item-response-type.decorator";
+import {STATUS_CODES} from "http";
+
 
 @ApiTags(TitleValue.title)
 @Controller('tasks')
@@ -41,10 +43,7 @@ export class TasksController {
   constructor(private readonly _tasksService: TasksService) {}
 
   @ApiOperation({ summary: TitleValue.createTask })
-  @ApiCreatedResponse({
-    type: Task,
-    description: 'Task Created successfully',
-  })
+  @ItemResponseTypeDecorator(Task, HttpStatus.CREATED, STATUS_CODES[HttpStatus.CREATED] )
   @Post()
   createTask(
     @UserDecorator() user: User,
@@ -78,9 +77,7 @@ export class TasksController {
   }
 
   @ApiOperation({ summary: TitleValue.getTask })
-  @ApiOkResponse({
-    type: [Task],
-  })
+  @ItemResponseTypeDecorator([Task], HttpStatus.OK, STATUS_CODES[HttpStatus.OK] )
   @Get()
   findAll(
     @UserDecorator() user: User,
@@ -90,9 +87,7 @@ export class TasksController {
   }
 
   @ApiOperation({ summary: TitleValue.updateTask })
-  @ApiOkResponse({
-    type: Task
-  })
+  @ItemResponseTypeDecorator(Task, HttpStatus.OK, STATUS_CODES[HttpStatus.OK] )
   @ApiBody({ type: UpdateTaskDto })
   @Patch(':id')
   update(
