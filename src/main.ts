@@ -23,6 +23,7 @@ async function bootstrap() {
   const appName = configService.get<string>('APP_NAME');
   const appDescription = configService.get<string>('APP_DESCRIPTION');
   app.useGlobalInterceptors(new ResponseInterceptor());
+  app.setGlobalPrefix('api/v1');
 
   const reflector = app.get(Reflector);
 
@@ -71,7 +72,6 @@ async function bootstrap() {
     }),
   );
   app.useGlobalFilters(new HttpExceptionFilter());
-  app.setGlobalPrefix('api/v1');
   await app.listen(port || 3000);
 }
 
