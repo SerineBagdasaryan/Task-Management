@@ -59,8 +59,7 @@ export class AuthService {
     const ttl = this._configService.get<number>('TTL');
     await this._cacheManager.set(String(user.id), token, ttl);
     return {
-      accessToken: token,
-      id: user.id,
+      accessToken: token
     };
   }
 
