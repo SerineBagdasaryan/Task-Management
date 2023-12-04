@@ -89,9 +89,7 @@ export class AuthService {
 
       return newUser;
     } catch (error) {
-      throw new InternalServerErrorException(
-        ERROR_MESSAGES.REGISTRATION_FAILED,
-      );
+      throw new InternalServerErrorException(error.message);
     }
   }
 
