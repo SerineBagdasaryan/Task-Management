@@ -1,14 +1,7 @@
-import {
-  IsDateString,
-  IsEnum,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { IsDateString, IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { DefaultValue } from '@common/utils/default-value';
 import { IsDateFormat } from '@Decorator/date.validator.decorator';
-import { TaskStatus } from '@modules/tasks/enum/task-status.enum';
 
 export class CreateTaskDto {
   @ApiProperty({
@@ -39,13 +32,4 @@ export class CreateTaskDto {
     message: 'Date must be in the format yyyy-MM-dd.',
   })
   dueDate: string;
-
-  @ApiProperty({
-    enum: TaskStatus,
-    default: TaskStatus.TODO,
-    required: false,
-  })
-  @IsOptional()
-  @IsEnum(TaskStatus)
-  status?: TaskStatus;
 }

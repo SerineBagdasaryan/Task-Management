@@ -1,11 +1,16 @@
-import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/user.dto';
 import { UserRepository } from './entities/users.repository';
 import { User } from './entities/users.entity';
 import { TasksService } from '../tasks/tasks.service';
 import { UpdateResult } from 'typeorm';
-import {UpdateProfileDto} from "@modules/users/dto/update-profile.dto";
-import {ERROR_MESSAGES} from "@common/messages";
+import { UpdateUserDto } from '@modules/users/dto/update-user.dto';
+import { ERROR_MESSAGES } from '@common/messages';
+import { isEmpty } from 'lodash';
 
 @Injectable()
 export class UsersService {
@@ -22,19 +27,28 @@ export class UsersService {
     return this._userRepository.findOneById(id);
   }
 
-  async update(id: number, updateProfileDto: UpdateProfileDto): Promise<User> {
-    if(Object.keys(updateProfileDto).length === 0) {
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+    if (isEmpty(updateUserDto)) {
       throw new NotFoundException(ERROR_MESSAGES.EMPTY_BODY);
     }
+
     const user = await this.findOne(id);
 
     if (!user) {
-      throw new BadRequestException(ERROR_MESSAGES.USER_NOT_EXISTS);
+      throw new NotFoundException(ERROR_MESSAGES.USER_NOT_EXISTS);
     }
 
-    Object.assign(user, updateProfileDto);
+    const existingUser = await this.getUserByEmail(updateUserDto.email);
+    if (existingUser && existingUser?.id !== id) {
+      throw new BadRequestException(ERROR_MESSAGES.USER_EMAIL_IN_USE);
+    }
 
-    return this._userRepository.save(user);
+    try {
+      await this._userRepository.update(id, updateUserDto);
+      return await this.findOne(id);
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
   }
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
