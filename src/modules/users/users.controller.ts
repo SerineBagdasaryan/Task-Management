@@ -1,4 +1,4 @@
-import {Body, Controller, Get, HttpStatus, Patch} from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Patch } from '@nestjs/common';
 import { User } from './entities/users.entity';
 import { User as UserDecorator } from '@Decorator/user.decorator';
 import { UsersService } from './users.service';
@@ -9,9 +9,9 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { TitleValue } from './utils/title-value';
-import {UpdateProfileDto} from "@modules/users/dto/update-profile.dto";
-import {ItemResponseTypeDecorator} from "@common/decorators";
-import {STATUS_CODES} from "http";
+import { UpdateUserDto } from '@modules/users/dto/update-user.dto';
+import { ItemResponseTypeDecorator } from '@common/decorators';
+import { STATUS_CODES } from 'http';
 
 @ApiTags(TitleValue.title)
 @Controller('users')
@@ -19,19 +19,20 @@ export class UsersController {
   constructor(private readonly _usersService: UsersService) {}
 
   @ApiOperation({ summary: TitleValue.getProfile })
-  @ItemResponseTypeDecorator(User, HttpStatus.OK, STATUS_CODES[HttpStatus.OK] )
+  @ItemResponseTypeDecorator(User, HttpStatus.OK, STATUS_CODES[HttpStatus.OK])
   @Get('profile')
   async findOne(@UserDecorator() user: User): Promise<User> {
     return this._usersService.findOne(user.id);
   }
 
   @ApiOperation({ summary: TitleValue.updateProfile })
-  @ItemResponseTypeDecorator(User, HttpStatus.OK, STATUS_CODES[HttpStatus.OK] )
+  @ItemResponseTypeDecorator(User, HttpStatus.OK, STATUS_CODES[HttpStatus.OK])
   @Patch('profile')
   async update(
-      @UserDecorator() user: User,
-      @Body() updateProfileDto: UpdateProfileDto): Promise<User> {
-    return this._usersService.update(user.id, updateProfileDto);
+    @UserDecorator() user: User,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<User> {
+    return this._usersService.update(user.id, updateUserDto);
   }
 
   @ApiOperation({ summary: TitleValue.getStat })
