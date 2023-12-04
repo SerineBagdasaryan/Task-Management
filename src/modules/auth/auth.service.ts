@@ -53,44 +53,28 @@ export class AuthService {
   async login(
     userDto: Pick<CreateUserDto, 'email' | 'password'>,
   ): Promise<TokenResponseDto> {
-    try {
-      const user = await this.validateUser(userDto);
-      const token = await this.generateToken(user);
-
-      await this._cacheManager.del(String(user.id));
-
-      const ttl = this._configService.get<number>('TTL');
-      await this._cacheManager.set(String(user.id), token, ttl);
-
-      return {
-        accessToken: token,
-      };
-    } catch (error) {
-      throw new UnauthorizedException(ERROR_MESSAGES.INVALID_CREDENTIALS);
-    }
+    const user = await this.validateUser(userDto);
+    const token = await this.generateToken(user);
+    await this._cacheManager.del(String(user.id));
+    const ttl = this._configService.get<number>('TTL');
+    await this._cacheManager.set(String(user.id), token, ttl);
+    return {
+      accessToken: token,
+    };
   }
 
   async registration(createUserDto: CreateUserDto): Promise<User> {
-    try {
-      const { email, password } = createUserDto;
-
-      const existingUser = await this._userService.getUserByEmail(email);
-
-      if (existingUser) {
-        throw new ConflictException(ERROR_MESSAGES.USER_NAME_EXISTS);
-      }
-
-      const hashPassword = await bcrypt.hash(password, 10);
-
-      const newUser = await this._userService.createUser({
-        ...createUserDto,
-        password: hashPassword,
-      });
-
-      return newUser;
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
+    const { email, password } = createUserDto;
+    const existingUser = await this._userService.getUserByEmail(email);
+    if (existingUser) {
+      throw new ConflictException(ERROR_MESSAGES.USER_NAME_EXISTS);
     }
+    const hashPassword = await bcrypt.hash(password, 10);
+
+    return await this._userService.createUser({
+      ...createUserDto,
+      password: hashPassword,
+    });
   }
 
   async generateToken(user: User): Promise<string> {
