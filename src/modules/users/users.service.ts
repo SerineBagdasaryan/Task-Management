@@ -43,10 +43,9 @@ export class UsersService {
       throw new BadRequestException(ERROR_MESSAGES.USER_EMAIL_IN_USE);
     }
 
-    Object.assign(user, updateUserDto);
-
     try {
-      return await this._userRepository.save(user);
+      await this._userRepository.update(id, updateUserDto);
+      return await this.findOne(id);
     } catch (e) {
       throw new BadRequestException(e.message);
     }
