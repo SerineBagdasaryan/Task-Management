@@ -14,4 +14,13 @@ export const USER_MESSAGES = {
   EMPTY_BODY: {
     message: 'err_empty_updated_body',
   },
+  USER_EMAIL_IN_USE: {
+    message: 'err_user_email_in_use',
+  },
+  INVALID_CREDENTIALS: {
+    message: 'Invalid Credentials',
+  },
+  REGISTRATION_FAILED: {
+    message: 'Registration failed',
+  },
 };

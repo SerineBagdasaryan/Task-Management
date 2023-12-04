@@ -17,7 +17,7 @@ import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { ConfigService } from '@nestjs/config';
 import { ERROR_MESSAGES } from '@common/messages';
-import {ChangePasswordDto} from "@modules/users/dto/change-password.dto";
+import { ChangePasswordDto } from '@modules/users/dto/change-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -53,28 +53,46 @@ export class AuthService {
   async login(
     userDto: Pick<CreateUserDto, 'email' | 'password'>,
   ): Promise<TokenResponseDto> {
-    const user = await this.validateUser(userDto);
-    const token = await this.generateToken(user);
-    await this._cacheManager.del(String(user.id));
-    const ttl = this._configService.get<number>('TTL');
-    await this._cacheManager.set(String(user.id), token, ttl);
-    return {
-      accessToken: token
-    };
+    try {
+      const user = await this.validateUser(userDto);
+      const token = await this.generateToken(user);
+
+      await this._cacheManager.del(String(user.id));
+
+      const ttl = this._configService.get<number>('TTL');
+      await this._cacheManager.set(String(user.id), token, ttl);
+
+      return {
+        accessToken: token,
+      };
+    } catch (error) {
+      throw new UnauthorizedException(ERROR_MESSAGES.INVALID_CREDENTIALS);
+    }
   }
 
   async registration(createUserDto: CreateUserDto): Promise<User> {
-    const { email, password } = createUserDto;
-    const existingUser = await this._userService.getUserByEmail(email);
-    if (existingUser) {
-        throw new ConflictException(ERROR_MESSAGES.USER_NAME_EXISTS);
-    }
-    const hashPassword = await bcrypt.hash(password, 10);
+    try {
+      const { email, password } = createUserDto;
 
-    return await this._userService.createUser({
-      ...createUserDto,
-      password: hashPassword,
-    });
+      const existingUser = await this._userService.getUserByEmail(email);
+
+      if (existingUser) {
+        throw new ConflictException(ERROR_MESSAGES.USER_NAME_EXISTS);
+      }
+
+      const hashPassword = await bcrypt.hash(password, 10);
+
+      const newUser = await this._userService.createUser({
+        ...createUserDto,
+        password: hashPassword,
+      });
+
+      return newUser;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        ERROR_MESSAGES.REGISTRATION_FAILED,
+      );
+    }
   }
 
   async generateToken(user: User): Promise<string> {
