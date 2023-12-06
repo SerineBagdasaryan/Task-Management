@@ -54,7 +54,9 @@ describe('AuthService', () => {
 
     jest.spyOn(usersServiceMock, 'getUserByEmail').mockResolvedValue(user);
     jest.spyOn(authService, 'validateUser').mockResolvedValue(user);
-    jest.spyOn(authService, 'generateToken').mockResolvedValue(accessToken);
+    jest
+      .spyOn(authService, 'generateAccessToken')
+      .mockResolvedValue(accessToken);
 
     const result = await authService.login(userDto);
 

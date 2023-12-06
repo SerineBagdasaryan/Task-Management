@@ -9,6 +9,7 @@ import * as jwt from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import { TokenResponseDto } from '@modules/users/dto/token-response.dto';
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
@@ -25,16 +26,25 @@ export class AuthMiddleware implements NestMiddleware {
     }
 
     try {
-      const secret = this._configService.get('SECRET');
-      const decodedToken = jwt.verify(token, secret);
-      const storedToken = await this._cacheManager.get(
-        String(decodedToken['id']),
+      const accessTokenSecret = this._configService.get('JWT_ACCESS_SECRET');
+      const decodedAccessToken = jwt.verify(token, accessTokenSecret);
+      const storedTokens: TokenResponseDto = await this._cacheManager.get(
+        String(decodedAccessToken['id']),
+      );
+      const refreshTokenSecret = this._configService.get('JWT_REFRESH_SECRET');
+      const decodedRefreshToken = jwt.verify(
+        storedTokens.refreshToken,
+        refreshTokenSecret,
       );
 
-      if (!storedToken || storedToken !== token) {
+      if (
+        !storedTokens ||
+        storedTokens.accessToken !== token ||
+        !decodedRefreshToken
+      ) {
         this._throwUnauthorized('Invalid token');
       }
-      req['user'] = decodedToken;
+      req['user'] = decodedAccessToken;
       next();
     } catch (error) {
       this._throwUnauthorized('Invalid token');

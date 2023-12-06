@@ -33,9 +33,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { TitleValue } from './utils/title-value';
-import { ItemResponseTypeDecorator } from "@Decorator/item-response-type.decorator";
-import {STATUS_CODES} from "http";
-
+import { ItemResponseTypeDecorator } from '@Decorator/item-response-type.decorator';
+import { STATUS_CODES } from 'http';
 
 @ApiTags(TitleValue.title)
 @Controller('tasks')
@@ -43,7 +42,11 @@ export class TasksController {
   constructor(private readonly _tasksService: TasksService) {}
 
   @ApiOperation({ summary: TitleValue.createTask })
-  @ItemResponseTypeDecorator(Task, HttpStatus.CREATED, STATUS_CODES[HttpStatus.CREATED] )
+  @ItemResponseTypeDecorator(
+    Task,
+    HttpStatus.CREATED,
+    STATUS_CODES[HttpStatus.CREATED],
+  )
   @Post()
   createTask(
     @UserDecorator() user: User,
@@ -77,7 +80,7 @@ export class TasksController {
   }
 
   @ApiOperation({ summary: TitleValue.getTask })
-  @ItemResponseTypeDecorator([Task], HttpStatus.OK, STATUS_CODES[HttpStatus.OK] )
+  @ItemResponseTypeDecorator([Task], HttpStatus.OK, STATUS_CODES[HttpStatus.OK])
   @Get()
   findAll(
     @UserDecorator() user: User,
@@ -87,14 +90,14 @@ export class TasksController {
   }
 
   @ApiOperation({ summary: TitleValue.updateTask })
-  @ItemResponseTypeDecorator(Task, HttpStatus.OK, STATUS_CODES[HttpStatus.OK] )
+  @ItemResponseTypeDecorator(Task, HttpStatus.OK, STATUS_CODES[HttpStatus.OK])
   @ApiBody({ type: UpdateTaskDto })
   @Patch(':id')
   update(
     @UserDecorator() user: User,
     @Param('id', ParseIntPipe) id: number,
     @Body() updateTaskDto: UpdateTaskDto,
-  ): Promise<Task>{
+  ): Promise<Task> {
     return this._tasksService.update(id, updateTaskDto, user);
   }
 
