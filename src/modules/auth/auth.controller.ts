@@ -16,7 +16,6 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiTags,
-  PickType,
 } from '@nestjs/swagger';
 import { TitleValue } from '@/modules/auth/utils/title-value';
 import { LoginUserDto } from '@/modules/users/dto/login-user.dto';
@@ -67,13 +66,13 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: TitleValue.refreshToken })
   @ApiOkResponse({
-    type: PickType(TokenResponseDto, ['accessToken']),
+    type: TokenResponseDto,
     description: STATUS_CODES[HttpStatus.OK],
   })
   @Post('/refresh-token')
   async refreshToken(
     @Body() refreshToken: RefreshTokenDto,
-  ): Promise<Pick<TokenResponseDto, 'accessToken'>> {
+  ): Promise<TokenResponseDto> {
     return this._authService.refreshToken(refreshToken);
   }
 }

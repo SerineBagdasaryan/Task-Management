@@ -9,7 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { TokenResponseDto } from '@modules/users/dto/token-response.dto';
-import { verifyToken } from '@common/utils/jwt-utils';
+import { verifyAccessToken, verifyRefreshToken } from '@common/utils/jwt-utils';
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
@@ -27,12 +27,12 @@ export class AuthMiddleware implements NestMiddleware {
 
     try {
       const accessTokenSecret = this._configService.get('JWT_ACCESS_SECRET');
-      const decodedAccessToken = verifyToken(token, accessTokenSecret);
+      const decodedAccessToken = verifyAccessToken(token, accessTokenSecret);
       const storedTokens: TokenResponseDto = await this._cacheManager.get(
         String(decodedAccessToken['id']),
       );
       const refreshTokenSecret = this._configService.get('JWT_REFRESH_SECRET');
-      const decodedRefreshToken = verifyToken(
+      const decodedRefreshToken = verifyRefreshToken(
         storedTokens.refreshToken,
         refreshTokenSecret,
       );
