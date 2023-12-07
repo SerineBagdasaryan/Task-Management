@@ -18,8 +18,8 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { ConfigService } from '@nestjs/config';
 import { ERROR_MESSAGES } from '@common/messages';
 import { ChangePasswordDto } from '@modules/users/dto/change-password.dto';
-import * as jwt from 'jsonwebtoken';
 import { RefreshTokenDto } from '@modules/users/dto/refresh-token.dto';
+import { verifyToken } from '@common/utils/jwt-utils';
 
 @Injectable()
 export class AuthService {
@@ -141,16 +141,17 @@ export class AuthService {
     try {
       const { refreshToken } = refreshTokenDto;
       const secret = this._configService.get('JWT_REFRESH_SECRET');
-      const decodedRefreshToken = this.verifyRefreshToken(refreshToken, secret);
-      if (!decodedRefreshToken) {
-        throw new UnauthorizedException('Invalid refresh token');
-      }
-
-      const accessToken = await this.generateAccessToken(decodedRefreshToken);
+      const decodedRefreshToken = verifyToken(refreshToken, secret);
 
       const cachedData: TokenResponseDto = (await this._cacheManager.get(
         String(decodedRefreshToken.id),
       )) || { accessToken: '', refreshToken: '' };
+
+      if (!decodedRefreshToken || refreshToken !== cachedData.refreshToken) {
+        throw new UnauthorizedException('Invalid refresh token');
+      }
+
+      const accessToken = await this.generateAccessToken(decodedRefreshToken);
 
       cachedData.accessToken = accessToken;
 
@@ -160,15 +161,5 @@ export class AuthService {
     } catch (e) {
       throw e;
     }
-  }
-
-  private verifyRefreshToken(refreshToken: string, secret: string): User {
-    const decodedRefreshToken = jwt.verify(refreshToken, secret) as User;
-
-    if (!decodedRefreshToken) {
-      throw new UnauthorizedException('Invalid refresh token');
-    }
-
-    return decodedRefreshToken;
   }
 }
