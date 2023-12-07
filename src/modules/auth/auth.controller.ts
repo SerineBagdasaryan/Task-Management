@@ -23,6 +23,7 @@ import { User as UserDecorator } from '@Decorator/user.decorator';
 import { ChangePasswordDto } from '@modules/users/dto/change-password.dto';
 import { STATUS_CODES } from 'http';
 import { RefreshTokenDto } from '@modules/users/dto/refresh-token.dto';
+import { ItemResponseTypeDecorator } from '@common/decorators';
 
 @ApiTags(TitleValue.title)
 @Controller('auth')
@@ -49,11 +50,11 @@ export class AuthController {
   registration(@Body() userDto: CreateUserDto): Promise<User> {
     return this._authService.registration(userDto);
   }
-  @ApiOperation({ summary: TitleValue.updatePassword })
-  @ApiOkResponse({
-    type: TokenResponseDto,
-    description: STATUS_CODES[HttpStatus.OK],
-  })
+  @ItemResponseTypeDecorator(
+    TokenResponseDto,
+    HttpStatus.OK,
+    STATUS_CODES[HttpStatus.OK],
+  )
   @ApiBody({ type: ChangePasswordDto })
   @Patch('/password')
   async changePassword(
@@ -63,12 +64,12 @@ export class AuthController {
     return this._authService.changePassword(user, changePasswordDto);
   }
 
-  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: TitleValue.refreshToken })
-  @ApiOkResponse({
-    type: TokenResponseDto,
-    description: STATUS_CODES[HttpStatus.OK],
-  })
+  @ItemResponseTypeDecorator(
+    TokenResponseDto,
+    HttpStatus.OK,
+    STATUS_CODES[HttpStatus.OK],
+  )
   @Post('/refresh-token')
   async refreshToken(
     @Body() refreshToken: RefreshTokenDto,
