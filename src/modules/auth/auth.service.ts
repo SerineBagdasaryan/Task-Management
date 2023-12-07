@@ -18,6 +18,8 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { ConfigService } from '@nestjs/config';
 import { ERROR_MESSAGES } from '@common/messages';
 import { ChangePasswordDto } from '@modules/users/dto/change-password.dto';
+import { RefreshTokenDto } from '@modules/users/dto/refresh-token.dto';
+import { verifyToken } from '@common/utils/jwt-utils';
 
 @Injectable()
 export class AuthService {
@@ -55,15 +57,23 @@ export class AuthService {
   ): Promise<TokenResponseDto> {
     try {
       const user = await this.validateUser(userDto);
-      const token = await this.generateToken(user);
+      const accessToken = await this.generateAccessToken(user);
+      const refreshToken = await this.generateRefreshToken(user);
 
       await this._cacheManager.del(String(user.id));
 
       const ttl = this._configService.get<number>('TTL');
-      await this._cacheManager.set(String(user.id), token, ttl);
-
+      await this._cacheManager.set(
+        String(user.id),
+        {
+          accessToken,
+          refreshToken,
+        },
+        ttl,
+      );
       return {
-        accessToken: token,
+        accessToken,
+        refreshToken,
       };
     } catch (error) {
       throw error;
@@ -93,9 +103,19 @@ export class AuthService {
     }
   }
 
-  async generateToken(user: User): Promise<string> {
+  async generateAccessToken(user: User): Promise<string> {
     const payload = { email: user.email, id: user.id, role: user.role };
     return await this._jwtService.signAsync(payload);
+  }
+  async generateRefreshToken(user: User): Promise<string> {
+    const refreshTokenSecret =
+      this._configService.get<string>('JWT_REFRESH_SECRET');
+    const refreshExpiresIn = this._configService.get<string>('REFRESH_EXP');
+
+    return this._jwtService.sign(
+      { id: user.id, email: user.email },
+      { secret: refreshTokenSecret, expiresIn: refreshExpiresIn },
+    );
   }
 
   async validateUser(
@@ -113,5 +133,33 @@ export class AuthService {
       return user;
     }
     throw new UnauthorizedException(ERROR_MESSAGES.PASSWORD_NOT_MATCH);
+  }
+
+  async refreshToken(
+    refreshTokenDto: RefreshTokenDto,
+  ): Promise<Pick<TokenResponseDto, 'accessToken'>> {
+    try {
+      const { refreshToken } = refreshTokenDto;
+      const secret = this._configService.get('JWT_REFRESH_SECRET');
+      const decodedRefreshToken = verifyToken(refreshToken, secret);
+
+      const cachedData: TokenResponseDto = (await this._cacheManager.get(
+        String(decodedRefreshToken.id),
+      )) || { accessToken: '', refreshToken: '' };
+
+      if (!decodedRefreshToken || refreshToken !== cachedData.refreshToken) {
+        throw new UnauthorizedException('Invalid refresh token');
+      }
+
+      const accessToken = await this.generateAccessToken(decodedRefreshToken);
+
+      cachedData.accessToken = accessToken;
+
+      await this._cacheManager.set(String(decodedRefreshToken.id), cachedData);
+
+      return { accessToken };
+    } catch (e) {
+      throw e;
+    }
   }
 }
