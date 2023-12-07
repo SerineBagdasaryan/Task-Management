@@ -23,4 +23,10 @@ export const USER_MESSAGES = {
   REGISTRATION_FAILED: {
     message: 'Registration failed',
   },
+  INVALID_ACCESS_TOKEN: {
+    message: 'err_invalid_access_token',
+  },
+  INVALID_REFRESH_TOKEN: {
+    message: 'err_invalid_refresh_token',
+  },
 };

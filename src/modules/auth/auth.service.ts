@@ -19,7 +19,7 @@ import { ConfigService } from '@nestjs/config';
 import { ERROR_MESSAGES } from '@common/messages';
 import { ChangePasswordDto } from '@modules/users/dto/change-password.dto';
 import { RefreshTokenDto } from '@modules/users/dto/refresh-token.dto';
-import { verifyToken } from '@common/utils/jwt-utils';
+import { verifyRefreshToken } from '@common/utils/jwt-utils';
 
 @Injectable()
 export class AuthService {
@@ -137,27 +137,40 @@ export class AuthService {
 
   async refreshToken(
     refreshTokenDto: RefreshTokenDto,
-  ): Promise<Pick<TokenResponseDto, 'accessToken'>> {
+  ): Promise<TokenResponseDto> {
     try {
       const { refreshToken } = refreshTokenDto;
       const secret = this._configService.get('JWT_REFRESH_SECRET');
-      const decodedRefreshToken = verifyToken(refreshToken, secret);
+      const decodedRefreshToken = verifyRefreshToken(refreshToken, secret);
 
-      const cachedData: TokenResponseDto = (await this._cacheManager.get(
+      const cachedTokens: TokenResponseDto = await this._cacheManager.get(
         String(decodedRefreshToken.id),
-      )) || { accessToken: '', refreshToken: '' };
+      );
 
-      if (!decodedRefreshToken || refreshToken !== cachedData.refreshToken) {
-        throw new UnauthorizedException('Invalid refresh token');
+      if (!decodedRefreshToken || refreshToken !== cachedTokens.refreshToken) {
+        throw new UnauthorizedException(ERROR_MESSAGES.INVALID_REFRESH_TOKEN);
       }
 
+      await this._cacheManager.del(String(decodedRefreshToken.id));
+
       const accessToken = await this.generateAccessToken(decodedRefreshToken);
+      const newRefreshToken = await this.generateRefreshToken(
+        decodedRefreshToken,
+      );
 
-      cachedData.accessToken = accessToken;
-
-      await this._cacheManager.set(String(decodedRefreshToken.id), cachedData);
-
-      return { accessToken };
+      const ttl = this._configService.get<number>('TTL');
+      await this._cacheManager.set(
+        String(decodedRefreshToken.id),
+        {
+          accessToken,
+          refreshToken: newRefreshToken,
+        },
+        ttl,
+      );
+      return {
+        accessToken,
+        refreshToken: newRefreshToken,
+      };
     } catch (e) {
       throw e;
     }
