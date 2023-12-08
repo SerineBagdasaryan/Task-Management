@@ -63,7 +63,7 @@ export class AuthController {
   ): Promise<TokenResponseDto> {
     return this._authService.changePassword(user, changePasswordDto);
   }
-
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: TitleValue.refreshToken })
   @ItemResponseTypeDecorator(
     TokenResponseDto,

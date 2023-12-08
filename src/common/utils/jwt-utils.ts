@@ -1,5 +1,3 @@
-// jwt-utils.ts
-
 import { UnauthorizedException } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
 import { ERROR_MESSAGES } from '@common/messages';
