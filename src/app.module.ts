@@ -12,6 +12,7 @@ import { StudentsModule } from '@/modules/students/students.module';
 import { CoursesModule } from '@/modules/courses/courses.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-redis-yet';
+import { CronModule } from '@crons/cron/cron.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { redisStore } from 'cache-manager-redis-yet';
       }),
       inject: [ConfigService],
     }),
+    CronModule,
   ],
   controllers: [AppController],
   providers: [AppService],
