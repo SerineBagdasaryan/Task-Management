@@ -51,10 +51,12 @@ export class UsersService {
     if (existingUserByEmail && existingUserByEmail?.id !== id) {
       throw new BadRequestException(ERROR_MESSAGES.USER_EMAIL_IN_USE);
     }
-    // if (file) {
-    const image = await this._filesService.create({ filename: file.filename });
-    updateUserDto['imageId'] = image.id;
-    // }
+    if (file?.filename) {
+      const image = await this._filesService.create({
+        filename: file.filename,
+      });
+      updateUserDto['imageId'] = image.id;
+    }
     try {
       await this._userRepository.update(id, updateUserDto);
       return await this.findOne(id);
