@@ -7,7 +7,7 @@ import { TaskStatus } from '@modules/tasks/enum/task-status.enum';
 @Injectable()
 export class CheckTasksStatusService {
   constructor(private readonly _connection: Connection) {}
-  @Cron(CronExpression.EVERY_MINUTE)
+  @Cron(CronExpression.EVERY_3_HOURS)
   async updateTasksStatus() {
     console.log('Executing cron job...');
     const repository = await this._connection.getRepository(Task);

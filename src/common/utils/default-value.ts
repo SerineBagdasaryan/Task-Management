@@ -7,4 +7,5 @@ export const DefaultValue = {
   email: 'test@gmail.com',
   firstName: 'Stella',
   lastName: 'Yan',
+  filename: 'image-1702467175729-500463048.jpeg',
 } as const;

@@ -1,14 +1,19 @@
-import {BadRequestException, Injectable, NotFoundException,} from '@nestjs/common';
-import {CreateTaskDto} from './dto/create-task.dto';
-import {UpdateTaskDto} from './dto/update-task.dto';
-import {TaskRepository} from './entities/task.repository';
-import {Task} from './entities/task.entity';
-import {Return} from '@Helper/return.helper';
-import {ResponseDataDTO} from '@Dto/response-data.dto';
-import {ResponseDataPaginationDTO} from '@Dto/response-data-pagination.dto';
-import {FilterTaskDto} from './dto/filter-task.dto';
-import {User} from '../users/entities/users.entity';
-import {ERROR_MESSAGES} from "@common/messages";
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { CreateTaskDto } from './dto/create-task.dto';
+import { UpdateTaskDto } from './dto/update-task.dto';
+import { TaskRepository } from './entities/task.repository';
+import { Task } from './entities/task.entity';
+import { Return } from '@Helper/return.helper';
+import { ResponseDataDTO } from '@Dto/response-data.dto';
+import { ResponseDataPaginationDTO } from '@Dto/response-data-pagination.dto';
+import { FilterTaskDto } from './dto/filter-task.dto';
+import { User } from '../users/entities/users.entity';
+import { ERROR_MESSAGES } from '@common/messages';
+import { Role } from '@common/enums';
 
 @Injectable()
 export class TasksService {
@@ -51,16 +56,38 @@ export class TasksService {
     }
   }
 
+  async getTask(id: number, user: User): Promise<Task> {
+    try {
+      let whereCondition: { id: number; userId?: number } = { id };
+      if (user.role === Role.USER) {
+        whereCondition = { ...whereCondition, userId: user.id };
+      }
+      const task = await this._taskRepository.findOne({
+        where: whereCondition,
+      });
+
+      if (!task) {
+        throw new NotFoundException(ERROR_MESSAGES.TASK_NOT_EXISTS);
+      }
+      return task;
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
   async update(
     id: number,
     updateTaskDto: UpdateTaskDto,
     user: User,
   ): Promise<Task> {
     try {
-      if(Object.keys(updateTaskDto).length === 0) {
+      if (Object.keys(updateTaskDto).length === 0) {
         throw new NotFoundException(ERROR_MESSAGES.NOT_UPDATED_DATA);
       }
-        const result = await this._taskRepository.updateTask(id, updateTaskDto, user);
+      const result = await this._taskRepository.updateTask(
+        id,
+        updateTaskDto,
+        user,
+      );
 
       if (!result) {
         throw new NotFoundException(ERROR_MESSAGES.TASK_NOT_EXISTS);

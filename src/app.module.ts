@@ -13,6 +13,7 @@ import { CoursesModule } from '@/modules/courses/courses.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-redis-yet';
 import { CronModule } from '@crons/cron/cron.module';
+import { FilesModule } from '@modules/files/files.module';
 
 @Module({
   imports: [
@@ -46,13 +47,14 @@ import { CronModule } from '@crons/cron/cron.module';
       inject: [ConfigService],
     }),
     CronModule,
+    FilesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthMiddleware).forRoutes('users', 'tasks', {
+    consumer.apply(AuthMiddleware).forRoutes('users', 'tasks', 'files', {
       path: 'auth/password',
       method: RequestMethod.PATCH,
     });

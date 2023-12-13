@@ -7,6 +7,7 @@ import { Student } from '@/modules/students/entities/student.entity';
 import { Course } from '@/modules/courses/entities/course.entity';
 import { addTransactionalDataSource } from 'typeorm-transactional';
 import { DataSource } from 'typeorm';
+import { Files } from '@modules/files/entities/file.entity';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { DataSource } from 'typeorm';
         username: configService.get('DB_USERNAME'),
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_NAME'),
-        entities: [User, Task, Student, Course],
+        entities: [User, Task, Student, Course, Files],
         synchronize: true,
       }),
       inject: [ConfigService],
