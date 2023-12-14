@@ -11,7 +11,7 @@ export class Files extends BaseEntity {
     default: DefaultValue.filename,
   })
   @Column()
-  filename: string;
+  imagePath: string;
 
   @OneToOne(() => User, user => user.file)
   user: User;
