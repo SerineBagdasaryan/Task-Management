@@ -12,6 +12,7 @@ import { UpdateUserDto } from '@modules/users/dto/update-user.dto';
 import { ERROR_MESSAGES } from '@common/messages';
 import { isEmpty } from 'lodash';
 import { FilesService } from '@modules/files/files.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UsersService {
@@ -19,6 +20,7 @@ export class UsersService {
     private readonly _userRepository: UserRepository,
     private readonly _taskService: TasksService,
     private readonly _filesService: FilesService,
+    private readonly _configService: ConfigService,
   ) {}
 
   async getUserByEmail(email: string): Promise<User> {
@@ -52,8 +54,11 @@ export class UsersService {
       throw new BadRequestException(ERROR_MESSAGES.USER_EMAIL_IN_USE);
     }
     if (file?.filename) {
+      const port = this._configService.get<string>('PORT');
+      const host = this._configService.get<string>('HOST');
+      const imagePath = `http://${host}:${port}/api/v1/files/${file.filename}`;
       const image = await this._filesService.create({
-        filename: file.filename,
+        imagePath,
       });
       updateUserDto['imageId'] = image.id;
     }

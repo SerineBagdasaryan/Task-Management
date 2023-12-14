@@ -8,7 +8,7 @@ export class CreateFileDto {
     default: DefaultValue.lastName,
     required: true,
   })
-  @IsNotEmpty({ message: 'File Name is required' })
-  @IsString({ message: 'File Name must be a string' })
-  filename: string;
+  @IsNotEmpty({ message: 'File is required' })
+  @IsString({ message: 'File must be a string' })
+  imagePath: string;
 }
