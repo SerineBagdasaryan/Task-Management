@@ -1,4 +1,11 @@
-import { Body, Controller, Get, HttpStatus, Patch } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Patch,
+  UploadedFile,
+} from '@nestjs/common';
 import { User } from './entities/users.entity';
 import { User as UserDecorator } from '@Decorator/user.decorator';
 import { UsersService } from './users.service';
@@ -12,6 +19,7 @@ import { TitleValue } from './utils/title-value';
 import { UpdateUserDto } from '@modules/users/dto/update-user.dto';
 import { ItemResponseTypeDecorator } from '@common/decorators';
 import { STATUS_CODES } from 'http';
+import { UploadFile } from '@Decorator/file-upload.decorator';
 
 @ApiTags(TitleValue.title)
 @Controller('users')
@@ -28,11 +36,13 @@ export class UsersController {
   @ApiOperation({ summary: TitleValue.updateProfile })
   @ItemResponseTypeDecorator(User, HttpStatus.OK, STATUS_CODES[HttpStatus.OK])
   @Patch('profile')
+  @UploadFile('image')
   async update(
     @UserDecorator() user: User,
     @Body() updateUserDto: UpdateUserDto,
+    @UploadedFile() file: Express.Multer.File,
   ): Promise<User> {
-    return this._usersService.update(user.id, updateUserDto);
+    return this._usersService.update(user.id, updateUserDto, file);
   }
 
   @ApiOperation({ summary: TitleValue.getStat })

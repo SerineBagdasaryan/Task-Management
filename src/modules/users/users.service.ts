@@ -11,12 +11,14 @@ import { UpdateResult } from 'typeorm';
 import { UpdateUserDto } from '@modules/users/dto/update-user.dto';
 import { ERROR_MESSAGES } from '@common/messages';
 import { isEmpty } from 'lodash';
+import { FilesService } from '@modules/files/files.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     private readonly _userRepository: UserRepository,
     private readonly _taskService: TasksService,
+    private readonly _filesService: FilesService,
   ) {}
 
   async getUserByEmail(email: string): Promise<User> {
@@ -27,8 +29,12 @@ export class UsersService {
     return this._userRepository.findOneById(id);
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
-    if (isEmpty(updateUserDto)) {
+  async update(
+    id: number,
+    updateUserDto: UpdateUserDto,
+    file: Express.Multer.File,
+  ): Promise<User> {
+    if (isEmpty(updateUserDto) && isEmpty(file)) {
       throw new NotFoundException(ERROR_MESSAGES.EMPTY_BODY);
     }
 
@@ -38,11 +44,19 @@ export class UsersService {
       throw new NotFoundException(ERROR_MESSAGES.USER_NOT_EXISTS);
     }
 
-    const existingUser = await this.getUserByEmail(updateUserDto.email);
-    if (existingUser && existingUser?.id !== id) {
+    const existingUserByEmail = updateUserDto.email
+      ? await this.getUserByEmail(updateUserDto.email)
+      : null;
+
+    if (existingUserByEmail && existingUserByEmail?.id !== id) {
       throw new BadRequestException(ERROR_MESSAGES.USER_EMAIL_IN_USE);
     }
-
+    if (file?.filename) {
+      const image = await this._filesService.create({
+        filename: file.filename,
+      });
+      updateUserDto['imageId'] = image.id;
+    }
     try {
       await this._userRepository.update(id, updateUserDto);
       return await this.findOne(id);

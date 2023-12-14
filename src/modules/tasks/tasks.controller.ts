@@ -79,7 +79,7 @@ export class TasksController {
     return 'Hello User!';
   }
 
-  @ApiOperation({ summary: TitleValue.getTask })
+  @ApiOperation({ summary: TitleValue.getTasks })
   @ItemResponseTypeDecorator([Task], HttpStatus.OK, STATUS_CODES[HttpStatus.OK])
   @Get()
   findAll(
@@ -87,6 +87,16 @@ export class TasksController {
     @Query() query: FilterTaskDto,
   ): Promise<ResponseDataPaginationDTO<Task[]>> {
     return this._tasksService.findAll(user, query);
+  }
+
+  @ApiOperation({ summary: TitleValue.getTask })
+  @ItemResponseTypeDecorator(Task, HttpStatus.OK, STATUS_CODES[HttpStatus.OK])
+  @Get(':id')
+  getTask(
+    @UserDecorator() user: User,
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<Task> {
+    return this._tasksService.getTask(id, user);
   }
 
   @ApiOperation({ summary: TitleValue.updateTask })
