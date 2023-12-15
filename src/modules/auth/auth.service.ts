@@ -113,7 +113,7 @@ export class AuthService {
     const refreshExpiresIn = this._configService.get<string>('REFRESH_EXP');
 
     return this._jwtService.sign(
-      { id: user.id, email: user.email },
+      { email: user.email, id: user.id, role: user.role },
       { secret: refreshTokenSecret, expiresIn: refreshExpiresIn },
     );
   }
