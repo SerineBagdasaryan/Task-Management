@@ -10,6 +10,8 @@ import { User } from './entities/users.entity';
 import { User as UserDecorator } from '@Decorator/user.decorator';
 import { UsersService } from './users.service';
 import {
+  ApiBody,
+  ApiConsumes,
   ApiExcludeEndpoint,
   ApiOkResponse,
   ApiOperation,
@@ -37,6 +39,18 @@ export class UsersController {
   @ItemResponseTypeDecorator(User, HttpStatus.OK, STATUS_CODES[HttpStatus.OK])
   @Patch('profile')
   @UploadFile('image')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        image: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
   async update(
     @UserDecorator() user: User,
     @Body() updateUserDto: UpdateUserDto,

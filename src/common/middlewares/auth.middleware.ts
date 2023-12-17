@@ -10,6 +10,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { TokenResponseDto } from '@modules/users/dto/token-response.dto';
 import { verifyAccessToken, verifyRefreshToken } from '@common/utils/jwt-utils';
+import { ERROR_MESSAGES } from '@common/messages';
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
@@ -22,7 +23,7 @@ export class AuthMiddleware implements NestMiddleware {
     const token = this.extractTokenFromHeader(req);
 
     if (!token) {
-      this._throwUnauthorized('Missing token');
+      this._throwUnauthorized(ERROR_MESSAGES.MISSING_TOKEN.message);
     }
 
     try {

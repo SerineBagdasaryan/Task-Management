@@ -29,4 +29,7 @@ export const USER_MESSAGES = {
   INVALID_REFRESH_TOKEN: {
     message: 'err_invalid_refresh_token',
   },
+  MISSING_TOKEN: {
+    message: 'err_missing_token',
+  },
 };
