@@ -21,6 +21,7 @@ import { TitleValue } from './utils/title-value';
 import { UpdateUserDto } from '@modules/users/dto/update-user.dto';
 import { ItemResponseTypeDecorator, UploadFile } from '@common/decorators';
 import { STATUS_CODES } from 'http';
+import { DefaultValue } from '@common/utils/default-value';
 
 @ApiTags(TitleValue.title)
 @Controller('users')
@@ -43,9 +44,9 @@ export class UsersController {
     schema: {
       type: 'object',
       properties: {
-        email: { type: 'string', example: 'test@gmail.com' },
-        firstName: { type: 'string', example: 'Stella' },
-        lastName: { type: 'string', example: 'Yan' },
+        email: { type: 'string', example: DefaultValue.email },
+        firstName: { type: 'string', example: DefaultValue.firstName },
+        lastName: { type: 'string', example: DefaultValue.lastName },
         image: {
           type: 'string',
           format: 'binary',
