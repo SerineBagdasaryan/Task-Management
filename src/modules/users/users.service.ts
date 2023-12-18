@@ -56,7 +56,7 @@ export class UsersService {
     if (file?.filename) {
       const port = this._configService.get<string>('PORT');
       const host = this._configService.get<string>('HOST');
-      const imagePath = `http://${host}:${port}/api/v1/files/${file.filename}`;
+      const imagePath = `http://${host}:${port}/uploads/${file.filename}`;
       const image = await this._filesService.create({
         imagePath,
       });

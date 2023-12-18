@@ -19,9 +19,8 @@ import {
 } from '@nestjs/swagger';
 import { TitleValue } from './utils/title-value';
 import { UpdateUserDto } from '@modules/users/dto/update-user.dto';
-import { ItemResponseTypeDecorator } from '@common/decorators';
+import { ItemResponseTypeDecorator, UploadFile } from '@common/decorators';
 import { STATUS_CODES } from 'http';
-import { UploadFile } from '@Decorator/file-upload.decorator';
 
 @ApiTags(TitleValue.title)
 @Controller('users')
@@ -44,6 +43,9 @@ export class UsersController {
     schema: {
       type: 'object',
       properties: {
+        email: { type: 'string', example: 'test@gmail.com' },
+        firstName: { type: 'string', example: 'Stella' },
+        lastName: { type: 'string', example: 'Yan' },
         image: {
           type: 'string',
           format: 'binary',
