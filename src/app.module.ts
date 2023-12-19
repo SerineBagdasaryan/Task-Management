@@ -14,6 +14,8 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-redis-yet';
 import { CronModule } from '@crons/cron/cron.module';
 import { FilesModule } from '@modules/files/files.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
   imports: [
@@ -48,13 +50,20 @@ import { FilesModule } from '@modules/files/files.module';
     }),
     CronModule,
     FilesModule,
+    ServeStaticModule.forRoot({
+      serveRoot: '/uploads',
+      rootPath: 'uploads',
+    }),
+    MulterModule.register({
+      dest: './uploads',
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthMiddleware).forRoutes('users', 'tasks', 'files', {
+    consumer.apply(AuthMiddleware).forRoutes('users', 'tasks', {
       path: 'auth/password',
       method: RequestMethod.PATCH,
     });

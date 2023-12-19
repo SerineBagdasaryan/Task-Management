@@ -10,6 +10,8 @@ import { User } from './entities/users.entity';
 import { User as UserDecorator } from '@Decorator/user.decorator';
 import { UsersService } from './users.service';
 import {
+  ApiBody,
+  ApiConsumes,
   ApiExcludeEndpoint,
   ApiOkResponse,
   ApiOperation,
@@ -17,9 +19,9 @@ import {
 } from '@nestjs/swagger';
 import { TitleValue } from './utils/title-value';
 import { UpdateUserDto } from '@modules/users/dto/update-user.dto';
-import { ItemResponseTypeDecorator } from '@common/decorators';
+import { ItemResponseTypeDecorator, UploadFile } from '@common/decorators';
 import { STATUS_CODES } from 'http';
-import { UploadFile } from '@Decorator/file-upload.decorator';
+import { DefaultValue } from '@common/utils/default-value';
 
 @ApiTags(TitleValue.title)
 @Controller('users')
@@ -37,6 +39,21 @@ export class UsersController {
   @ItemResponseTypeDecorator(User, HttpStatus.OK, STATUS_CODES[HttpStatus.OK])
   @Patch('profile')
   @UploadFile('image')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        email: { type: 'string', example: DefaultValue.email },
+        firstName: { type: 'string', example: DefaultValue.firstName },
+        lastName: { type: 'string', example: DefaultValue.lastName },
+        image: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
   async update(
     @UserDecorator() user: User,
     @Body() updateUserDto: UpdateUserDto,

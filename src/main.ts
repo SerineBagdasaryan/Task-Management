@@ -52,9 +52,9 @@ async function bootstrap() {
         enableImplicitConversion: true,
       },
       stopAtFirstError: true,
-      exceptionFactory: (errors) => {
+      exceptionFactory: errors => {
         const errorResponse: IValidationErrors[] = [];
-        errors.forEach((e) => {
+        errors.forEach(e => {
           if (e.constraints) {
             errorResponse.push(...validationHandler([e]));
           }
