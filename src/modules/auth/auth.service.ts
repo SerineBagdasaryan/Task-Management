@@ -19,7 +19,8 @@ import { ConfigService } from '@nestjs/config';
 import { ERROR_MESSAGES } from '@common/messages';
 import { ChangePasswordDto } from '@modules/users/dto/change-password.dto';
 import { RefreshTokenDto } from '@modules/users/dto/refresh-token.dto';
-import { verifyRefreshToken } from '@common/utils/jwt-utils';
+import { verifyToken } from '@common/utils/jwt-utils';
+import { Token } from '@common/enums';
 
 @Injectable()
 export class AuthService {
@@ -140,8 +141,12 @@ export class AuthService {
   ): Promise<TokenResponseDto> {
     try {
       const { refreshToken } = refreshTokenDto;
-      const secret = this._configService.get('JWT_REFRESH_SECRET');
-      const decodedRefreshToken = verifyRefreshToken(refreshToken, secret);
+      const refreshSecret = this._configService.get('JWT_REFRESH_SECRET');
+      const decodedRefreshToken: User = verifyToken(
+        refreshToken,
+        refreshSecret,
+        Token.refresh,
+      );
 
       const cachedTokens: TokenResponseDto = await this._cacheManager.get(
         String(decodedRefreshToken.id),
