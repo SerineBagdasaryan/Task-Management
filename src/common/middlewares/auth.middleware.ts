@@ -9,8 +9,9 @@ import { ConfigService } from '@nestjs/config';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { TokenResponseDto } from '@modules/users/dto/token-response.dto';
-import { verifyAccessToken, verifyRefreshToken } from '@common/utils/jwt-utils';
+import { verifyToken } from '@common/utils/jwt-utils';
 import { ERROR_MESSAGES } from '@common/messages';
+import { Token } from '@common/enums';
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
@@ -28,14 +29,22 @@ export class AuthMiddleware implements NestMiddleware {
 
     try {
       const accessTokenSecret = this._configService.get('JWT_ACCESS_SECRET');
-      const decodedAccessToken = verifyAccessToken(token, accessTokenSecret);
+      const refreshTokenSecret = this._configService.get('JWT_REFRESH_SECRET');
+
+      const decodedAccessToken = verifyToken(
+        token,
+        accessTokenSecret,
+        Token.access,
+      );
+
       const storedTokens: TokenResponseDto = await this._cacheManager.get(
         String(decodedAccessToken['id']),
       );
-      const refreshTokenSecret = this._configService.get('JWT_REFRESH_SECRET');
-      const decodedRefreshToken = verifyRefreshToken(
+
+      const decodedRefreshToken = verifyToken(
         storedTokens.refreshToken,
         refreshTokenSecret,
+        Token.refresh,
       );
 
       if (
